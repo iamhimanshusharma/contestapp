@@ -1,5 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
+const TestcaseSchema = new Schema({
+    input: { type: String, required: true },
+    expected: { type: String, required: true }
+});
+
 const problemSchema = new Schema({
     problemId: {
         type: String,
@@ -29,6 +34,10 @@ const problemSchema = new Schema({
     constraints: {
         type: String,
         required: true,
+    },
+    testcases: {
+        type: [TestcaseSchema],
+        required: true
     },
     createdby: {
         type: Schema.Types.ObjectId,

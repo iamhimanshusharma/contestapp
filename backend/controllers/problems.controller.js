@@ -61,7 +61,7 @@ export const uploadProblems = async (req, res) => {
         }
 
         const response = await Problem.create({
-            problemId, title, difficulty, description, input, output, constraints
+            problemId, title, difficulty, description, input, output, constraints, testcases
         })
 
         if (!response) {
@@ -71,24 +71,10 @@ export const uploadProblems = async (req, res) => {
             })
         }
 
-        const testcaseResponse = await TestCase.create({
-            problemId: response._id,
-            input: testcases.input,
-            output: testcases.output
-        })
-
-        if (!testcaseResponse) {
-            return res.status(409).json({
-                success: false,
-                message: "Testcase upload failed",
-            })
-        }
-
         return res.status(200).json({
             success: true,
             message: "Problem uploaded Successfully",
-            problem: response,
-            testcases: testcaseResponse
+            problem: response
         })
 
     } catch (error) {
