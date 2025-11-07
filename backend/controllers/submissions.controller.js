@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import util from "util";
@@ -34,10 +34,23 @@ const languageConfig = {
     }
 };
 
+async function ensureSandbox(containerName, image = "sandboxed-env") {
+    try {
+        // Check if container exists
+        const { stdout } = await execPromise(`docker inspect -f '{{.State.Running}}' ${containerName}`);
+        const isRunning = stdout.trim() === "true";
+
+        if (!isRunning) {
+            await execPromise(`docker start ${containerName}`);
+        }
+    } catch (err) {
+        // Container does not exists, create new
+        await execPromise(`docker run -d --name ${containerName} --network none ${image} tail -f /dev/null`);
+    }
+}
 
 export const submitSolution = async (req, res) => {
-    const containerName = `run-${Date.now()}`;
-    let workDir;
+    const containerName = "sandboxed-env";
 
     try {
         const { language, problemId, code } = req.body;
@@ -54,25 +67,28 @@ export const submitSolution = async (req, res) => {
 
         const testcases = problem.testcases;
 
-        workDir = path.join(process.cwd(), `sub-${Date.now()}`);
-        fs.mkdirSync(workDir, { recursive: true });
-
-        const localFile = path.join(workDir, lang.file);
-        fs.writeFileSync(localFile, code);
+        const isolatedFolderName = `sub-${Date.now()}`;
 
         try {
-            //keeps the container running
-            await execPromise(`docker run -d --name ${containerName} --network none sandboxed-env tail -f /dev/null`);
 
-            //copying the localfile's code into the main.cpp file in /app on container
-            await execPromise(`docker cp "${localFile}" ${containerName}:/app/${lang.file}`);
+            //check if container is running or not, if not then start it, if not create then create it
+            await ensureSandbox(containerName);
+
+            //create a temporary folder on container
+            await execPromise(`docker exec ${containerName} mkdir -p /app/${isolatedFolderName}`);
+
+            const child = spawn("docker", ["exec", "-i", containerName, "sh", "-c", `tee /app/${isolatedFolderName}/${lang.file} > /dev/null`]);
+
+            child.stdin.write(code);
+            child.stdin.end();
 
             //compiling the code in main.cpp file
             if (lang.compile) {
-                await execPromise(`docker exec ${containerName} sh -c "${lang.compile}"`);
+                await execPromise(
+                    `docker exec ${containerName} sh -c "cd /app/${isolatedFolderName} && ${lang.compile}"`
+                );
             }
         } catch (err) {
-            await execPromise(`docker rm -f ${containerName}`);
             return res.status(200).json({
                 success: false,
                 message: "Compilation error",
@@ -87,7 +103,7 @@ export const submitSolution = async (req, res) => {
             try {
                 const safeInput = tc.input.replace(/"/g, '\\"');
                 const { stdout } = await execPromise(
-                    `printf "${safeInput}" | docker exec -i ${containerName} ${lang.run}`
+                    `printf "${safeInput}" | docker exec -i ${containerName} sh -c "cd /app/${isolatedFolderName} && ${lang.run}"`
                 );
 
                 const output = stdout.trim();
@@ -105,8 +121,8 @@ export const submitSolution = async (req, res) => {
             }
         }
 
-        await execPromise(`docker rm -f ${containerName}`);
-        fs.rmSync(workDir, { recursive: true, force: true });
+        await execPromise(`docker exec ${containerName} rm -rf /app/${isolatedFolderName}`);
+
 
         return res.status(200).json({
             success: true,
@@ -117,14 +133,7 @@ export const submitSolution = async (req, res) => {
     } catch (err) {
 
         // delete the created folder, if exists
-        if (workDir && fs.existsSync(workDir)) {
-            fs.rmSync(workDir, { recursive: true, force: true });
-        }
-
-        // delete the container, if exists
-        try {
-            await execPromise(`docker rm -f ${containerName}`);
-        } catch { }
+        await execPromise(`docker exec ${containerName} rm -rf /app/${isolatedFolderName}`);
 
         return res.status(500).json({
             success: false,
