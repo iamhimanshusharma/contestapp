@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import util from "util";
 import { Problem } from "../models/problems.model.js";
+import { TestCase } from "../models/testcases.model.js";
 
 const execPromise = util.promisify(exec);
 
@@ -51,9 +52,11 @@ async function ensureSandbox(containerName, image = "sandboxed-env") {
 
 export const submitSolution = async (req, res) => {
     const containerName = "sandboxed-env";
+    const isolatedFolderName = `sub-${Date.now()}`;
+    let testcases;
 
     try {
-        const { language, problemId, code } = req.body;
+        const { type, language, problemId, code } = req.body;
 
         const lang = languageConfig[language];
 
@@ -65,9 +68,24 @@ export const submitSolution = async (req, res) => {
             });
         }
 
-        const testcases = problem.testcases;
-
-        const isolatedFolderName = `sub-${Date.now()}`;
+        if (type === "sample") {
+            testcases = await TestCase.aggregate([
+                { $match: { problemId: problem._id } },
+                { $unwind: "$testcases" },
+                { $match: { "testcases.testcaseType": "sample" } },
+                {
+                    $project: {
+                        _id: 0,
+                        input: "$testcases.input",
+                        expected: "$testcases.expected",
+                        testcaseType: "$testcases.testcaseType"
+                    }
+                }
+            ]);
+        } else {
+            const getTestcases = await TestCase.findOne({ problemId: problem._id });
+            testcases = getTestcases.testcases;
+        }
 
         try {
 
@@ -93,7 +111,7 @@ export const submitSolution = async (req, res) => {
             return res.status(200).json({
                 success: false,
                 message: "Compilation error",
-                error: err.stderr || err.message
+                error: err.stderr
             });
         }
 
@@ -109,15 +127,30 @@ export const submitSolution = async (req, res) => {
 
                 const output = stdout.trim();
                 const passed = output === tc.expected.trim();
-                results.push({ input: tc.input, output, expected: tc.expected.trim(), passed });
+
+                if (!passed && type === "hidden" && tc.testcaseType === "hidden") {
+                    return res.status(200).json({
+                        success: false,
+                        message: "Testcase failed",
+                        failedTestcase: {
+                            input: safeInput,
+                            output,
+                            expected: tc.expected.trim(),
+                            passed: false
+                        },
+                        results: results
+                    })
+                };
+
+                if (tc.testcaseType.trim() === "sample") results.push({ input: tc.input, output, expected: tc.expected.trim(), passed });
                 if (!passed) allPassed = false;
 
             } catch (err) {
-                results.push({
+                return res.status(200).json({
                     success: false,
                     message: "Runtime error",
-                    error: err.message
-                });
+                    error: err.stderr
+                })
                 allPassed = false;
             }
         }
@@ -139,7 +172,7 @@ export const submitSolution = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: err.message
+            error: err.stderr
         });
     }
 };

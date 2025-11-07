@@ -29,9 +29,32 @@ export const getProblemById = async (req, res) => {
             })
         }
 
+        const getTestcases = await TestCase.aggregate([
+            { $match: { problemId: getProblem._id } },
+            { $unwind: "$testcases" },
+            { $match: { "testcases.testcaseType": "sample" } },
+            {
+                $project: {
+                    _id: 0,
+                    input: "$testcases.input",
+                    expected: "$testcases.expected",
+                    testcaseType: "$testcases.testcaseType"
+                }
+            }
+        ]);
+
+
+        if (!getTestcases) {
+            return res.status(404).json({
+                success: false,
+                problemData: "Test case not found!"
+            })
+        }
+
         return res.status(200).json({
             success: true,
-            problemData: getProblem
+            problemData: getProblem,
+            testcases: getTestcases
         })
 
     } catch (error) {
@@ -61,13 +84,25 @@ export const uploadProblems = async (req, res) => {
         }
 
         const response = await Problem.create({
-            problemId, title, difficulty, description, input, output, constraints, testcases
+            problemId, title, difficulty, description, input, output, constraints
         })
 
         if (!response) {
             return res.status(410).json({
                 success: false,
                 message: "Problem upload failed"
+            })
+        }
+
+        const testcaseResponse = await TestCase.create({
+            problemId: response._id,
+            testcases: testcases
+        })
+
+        if (!testcaseResponse) {
+            return res.status(410).json({
+                success: false,
+                message: "Testcase upload failed"
             })
         }
 
