@@ -80,9 +80,10 @@ export const submitSolution = async (req, res) => {
             const child = spawn("docker", ["exec", "-i", containerName, "sh", "-c", `tee /app/${isolatedFolderName}/${lang.file} > /dev/null`]);
 
             child.stdin.write(code);
+
             child.stdin.end();
 
-            //compiling the code in main.cpp file
+            //compiling the code
             if (lang.compile) {
                 await execPromise(
                     `docker exec ${containerName} sh -c "cd /app/${isolatedFolderName} && ${lang.compile}"`
