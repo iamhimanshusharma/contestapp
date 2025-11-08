@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom";
 
 const Problem = () => {
     const [language, setLanguage] = useState("cpp");
+    const [leftWidth, setLeftWidth] = useState(50);
+    const [upHeight, setUpHeight] = useState(70);
     const editorRef = useRef(null);
     const [responseData, setResponseData] = useState([]);
     const [submitResponseData, setSubmitResponseData] = useState();
@@ -17,6 +19,10 @@ const Problem = () => {
     const [allTestcase, setAllTestcase] = useState([]);
     const [getError, setError] = useState();
     const [isError, setIsError] = useState(false);
+    const containerRef = useRef(null);
+    const isDragging = useRef(false);
+    const varContainerRef = useRef(null);
+    const varIsDragging = useRef(false);
 
     const tabs = [
         { id: "description", label: "Description" },
@@ -83,8 +89,56 @@ const Problem = () => {
         }
     }
 
+    const handleMouseDown = () => {
+        isDragging.current = true;
+        document.body.style.cursor = "col-resize";
+    };
+
+    const varHandleMouseDown = () => {
+        varIsDragging.current = true;
+        document.body.style.cursor = "col-resize";
+    };
+
+    const handleMouseUp = () => {
+        isDragging.current = false;
+        document.body.style.cursor = "default";
+    };
+
+    const varHandleMouseUp = () => {
+        varIsDragging.current = false;
+        document.body.style.cursor = "default";
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging.current) return;
+        const containerWidth = containerRef.current.offsetWidth;
+        const newLeftWidth = (e.clientX / containerWidth) * 100;
+        if (newLeftWidth > 10 && newLeftWidth < 90) {
+            setLeftWidth(newLeftWidth);
+        }
+    };
+
+    const varHandleMouseMove = (e) => {
+        if (!varIsDragging.current) return;
+        const containerHeight = varContainerRef.current.offsetHeight;
+        const newUpHeight = (e.clientY / containerHeight) * 100;
+        if (newUpHeight > 10 && newUpHeight < 90) {
+            setUpHeight(newUpHeight);
+        }
+    };
+
     useEffect(() => {
         loadProblem(problemId);
+        window.addEventListener("mouseup", handleMouseUp);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", varHandleMouseUp);
+        window.addEventListener("mousemove", varHandleMouseMove);
+        return () => {
+            window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", varHandleMouseUp);
+            window.removeEventListener("mousemove", varHandleMouseMove);
+        };
     }, []);
 
     async function runCode(type) {
@@ -135,106 +189,192 @@ const Problem = () => {
         }
     }
 
+
+
     return (
         <>
-            <div className="grid grid-flow-col grid-rows-10 grid-cols-2 gap-1 h-screen">
-                <div className="flex items-center justify-center row-span-1 col-span-2 border-2 border-gray-300">
-                    <button className="text-white bg-gray-500 rounded-md shadow-md cursor-pointer m-1 p-2" onClick={() => runCode("sample")}><img src="../run.png" alt="" className="h-5 w-5" /></button>
-                    <button className="text-white bg-gray-500 text-lg py-1 px-6 rounded-md shadow-md cursor-pointer m-1" onClick={() => runCode("hidden")}>Submit</button>
+            <div className="gap-1 h-screen flex flex-col">
+                <div className="flex items-center justify-center border-2 border-gray-300">
+                    <button
+                        className="text-white bg-gray-500 rounded-md shadow-md cursor-pointer m-1 p-2"
+                        onClick={() => runCode("sample")}
+                    >
+                        <img src="../run.png" alt="" className="h-5 w-5" />
+                    </button>
+                    <button
+                        className="text-white bg-gray-500 text-lg py-1 px-6 rounded-md shadow-md cursor-pointer m-1"
+                        onClick={() => runCode("hidden")}
+                    >
+                        Submit
+                    </button>
                 </div>
-                <div className="row-span-9 col-span-1 border border-black border-2 border-gray-300 rounded-md">
-                    <div className="flex border-b border-gray-300">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`relative flex-1 py-2 text-center transition-all duration-300 
-              ${activeTab === tab.id
+
+                <div ref={containerRef} className="flex w-full flex-1 overflow-hidden">
+                    <div
+                        className="border-2 border-gray-300 rounded-md flex flex-col"
+                        style={{ width: `${leftWidth}%` }}
+                    >
+                        <div className="flex border-b border-gray-300">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative flex-1 py-2 text-center transition-all duration-300 ${activeTab === tab.id
                                         ? "text-gray-700 bg-gray-200"
                                         : "text-gray-700 hover:text-gray-500"
-                                    }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                                        }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="py-3 px-5 bg-white overflow-auto flex-1">
+                            {renderContent()}
+                        </div>
                     </div>
 
-                    <div className="py-3 px-5 bg-white overflow-auto">{renderContent()}</div>
-                </div>
-                <div className="grid row-span-7 col-span-1 border-2 border-gray-300 rounded-md">
-                    <div className="row-span-1 px-2 pt-2">
-                        <select name="" id="language" className="py-1 px-3" onChange={onChangeHandler}>
-                            <option value="cpp">c++</option>
-                            <option value="c">c</option>
-                            <option value="python">python</option>
-                            <option value="java">java</option>
-                            <option value="javascript">javascript</option>
-                        </select>
-                    </div>
-                    <div className="row-span-20 p-2">
-                        <Editor language={language} value={`//` + language} height='100%' onMount={handleEditorDidMount} />
-                    </div>
-                </div>
-                <div className="row-span-2 border border-black overflow-auto py-2 px-4 border-2 border-gray-300 rounded-md">
-                    {isError ? (<div>
-                        <p className="text-xl text-red-600 font-bold">{getError?.message}</p>
-                        <p className="text-sm text-red-600 mt-2">{getError?.error}</p>
-                    </div>) : (
-                        submissionType !== "none" ? (<div>
-                            <div className="flex w-full gap-3 overflow-auto p-2">
-                                {responseData.map((testcase, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveTestcase(index)}
-                                        className={`${testcase.passed ? "ring-green-500 text-green-500" : "ring-red-500 text-red-500"} ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer
-                            ${activeTestcase === index
-                                                ? "bg-gray-200"
-                                                : "hover:bg-gray-300"
-                                            }`}
+                    <div
+                        className="w-1 hover:bg-blue-700 cursor-col-resize"
+                        onMouseDown={handleMouseDown}
+                    ></div>
+
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        <div ref={varContainerRef} className="flex flex-col h-full w-full">
+                            <div
+                                className="border-2 border-gray-300 rounded-md flex flex-col"
+                                style={{ height: `${upHeight}%` }}
+                            >
+                                <div className="px-2 pt-2">
+                                    <select
+                                        name=""
+                                        id="language"
+                                        className="py-1 px-3 border rounded"
+                                        onChange={onChangeHandler}
                                     >
-                                        {`Case ${index}`}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="w-full bg-white shadow">
-                                <div className="mt-2">
-                                    <p className="text-sm font-bold mt-2">Input</p>
-                                    <input type="text" name="input" id="" disabled value={responseData[activeTestcase]?.input || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                                    <p className="text-sm font-bold mt-2">Output</p>
-                                    <input type="text" name="input" id="" disabled value={responseData[activeTestcase]?.output || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                                    <p className="text-sm font-bold mt-2">Expected</p>
-                                    <input type="text" name="input" id="" disabled value={responseData[activeTestcase]?.expected || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
+                                        <option value="cpp">C++</option>
+                                        <option value="c">C</option>
+                                        <option value="python">Python</option>
+                                        <option value="java">Java</option>
+                                        <option value="javascript">JavaScript</option>
+                                    </select>
+                                </div>
+
+                                <div className="p-2 flex-1 overflow-auto">
+                                    <Editor
+                                        language={language}
+                                        value={`//` + language}
+                                        height="100%"
+                                        onMount={handleEditorDidMount}
+                                    />
                                 </div>
                             </div>
-                        </div>) : (<div>
-                            <div className="flex w-full gap-3 overflow-auto p-2">
-                                {allTestcase.map((testcase, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveTestcase(index)}
-                                        className={`ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer
-                            ${activeTestcase === index
-                                                ? "text-gray-700 bg-gray-200"
-                                                : "text-gray-700 hover:text-gray-500"
-                                            }`}
-                                    >
-                                        {`Case ${index}`}
-                                    </button>
-                                ))}
+
+                            <div
+                                className="h-1 hover:bg-blue-700 cursor-row-resize"
+                                onMouseDown={varHandleMouseDown}
+                            ></div>
+
+                            <div className="border-2 border-gray-300 rounded-md overflow-auto py-2 px-4 flex-1">
+                                {isError ? (
+                                    <div>
+                                        <p className="text-xl text-red-600 font-bold">
+                                            {getError?.message}
+                                        </p>
+                                        <p className="text-sm text-red-600 mt-2">{getError?.error}</p>
+                                    </div>
+                                ) : submissionType !== "none" ? (
+                                    <div>
+                                        <div className="flex w-full gap-3 overflow-auto p-2">
+                                            {responseData.map((testcase, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => setActiveTestcase(index)}
+                                                    className={`${testcase.passed
+                                                        ? "ring-green-500 text-green-500"
+                                                        : "ring-red-500 text-red-500"
+                                                        } ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer ${activeTestcase === index
+                                                            ? "bg-gray-200"
+                                                            : "hover:bg-gray-300"
+                                                        }`}
+                                                >
+                                                    {`Case ${index}`}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <div className="w-full bg-white shadow mt-2">
+                                            <p className="text-sm font-bold mt-2">Input</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={responseData[activeTestcase]?.input || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                            <p className="text-sm font-bold mt-2">Output</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={responseData[activeTestcase]?.output || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                            <p className="text-sm font-bold mt-2">Expected</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={responseData[activeTestcase]?.expected || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="flex w-full gap-3 overflow-auto p-2">
+                                            {allTestcase.map((testcase, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => setActiveTestcase(index)}
+                                                    className={`ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer ${activeTestcase === index
+                                                        ? "text-gray-700 bg-gray-200"
+                                                        : "text-gray-700 hover:text-gray-500"
+                                                        }`}
+                                                >
+                                                    {`Case ${index}`}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <div className="w-full bg-white shadow mt-2">
+                                            <p className="text-sm font-bold mt-2">Input</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={allTestcase[activeTestcase]?.input || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                            <p className="text-sm font-bold mt-2">Output</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={allTestcase[activeTestcase]?.output || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                            <p className="text-sm font-bold mt-2">Expected</p>
+                                            <input
+                                                type="text"
+                                                disabled
+                                                value={allTestcase[activeTestcase]?.expected || ""}
+                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="w-full bg-white shadow">
-                                <div className="mt-2">
-                                    <p className="text-sm font-bold mt-2">Input</p>
-                                    <input type="text" name="input" disabled id="" value={allTestcase[activeTestcase]?.input || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                                    <p className="text-sm font-bold mt-2">Output</p>
-                                    <input type="text" name="output" id="" disabled value={allTestcase[activeTestcase]?.output || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                                    <p className="text-sm font-bold mt-2">Expected</p>
-                                    <input type="text" name="expected" id="" disabled value={allTestcase[activeTestcase]?.expected || ""} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                                </div>
-                            </div>
-                        </div>))}
+                        </div>
+                    </div>
                 </div>
-            </div >
+            </div>
+
         </>
     );
 };
