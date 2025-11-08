@@ -196,16 +196,19 @@ const Problem = () => {
             <div className="gap-1 h-screen flex flex-col">
                 <div className="flex items-center justify-center border-2 border-gray-300">
                     <button
-                        className="text-white bg-gray-500 rounded-md shadow-md cursor-pointer m-1 p-2"
+                        className="rounded-md shadow-md cursor-pointer m-1 p-1 ring-3 ring-gray-100"
                         onClick={() => runCode("sample")}
                     >
-                        <img src="../run.png" alt="" className="h-5 w-5" />
+                        <img src="../run.svg" alt="" className="h-7 w-7" />
                     </button>
                     <button
-                        className="text-white bg-gray-500 text-lg py-1 px-6 rounded-md shadow-md cursor-pointer m-1"
+                        className="py-1 px-2 rounded-md shadow-md cursor-pointer m-1 ring-3 ring-gray-100"
                         onClick={() => runCode("hidden")}
                     >
-                        Submit
+                        <div className="flex items-center justify-center gap-2">
+                            <img src="../upload1.svg" alt="" className="h-7 w-7" />
+                            <p className="text-lg text-green-500 font-bold">Submit</p>
+                        </div>
                     </button>
                 </div>
 
