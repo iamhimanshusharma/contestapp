@@ -15,6 +15,7 @@
     "@uiw/react-markdown-preview": "^5.1.5",
     "@uiw/react-md-editor": "^4.0.8",
     "axios": "^1.13.1",
+    "katex": "^0.16.25",
     "react": "^19.1.1",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.5",

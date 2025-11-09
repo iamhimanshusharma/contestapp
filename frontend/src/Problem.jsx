@@ -3,6 +3,8 @@ import axios from "axios";
 import UserEditor from "./UserEditor";
 import { Editor } from "@monaco-editor/react";
 import { useParams } from "react-router-dom";
+import MarkdownPreview from '@uiw/react-markdown-preview';
+
 
 const Problem = () => {
     const [language, setLanguage] = useState("cpp");
@@ -35,7 +37,8 @@ const Problem = () => {
                 return <div className="m-2">
                     <p className="text-2xl font-bold my-2">{problemData.title}</p>
                     <span className={`${getDifficulty(problemData.difficulty)} text-sm border border-gray-300 px-3 pb-1 rounded-full`}>{problemData.difficulty}</span>
-                    <p className="text-md my-2">{problemData.description}</p>
+                    {/* <p className="text-md my-2">{problemData.description}</p> */}
+                    <MarkdownPreview className="text-md my-2" source={problemData.description} wrapperElement={{ "data-color-mode": "light" }} />
                     <span className="text-sm font-bold">Input</span>
                     <p className="text-sm my-2">{problemData.input}</p>
                     <span className="text-sm font-bold">Output</span>
