@@ -1,5 +1,11 @@
 # contestapp
 
+> Clone the project
+```
+gh repo clone iamhimanshusharma/contestapp
+```
+
+> Replace the `imageName` and `containerName` with yours in `backend/constants.js`
 
 > To run the node app in node container
 ```
