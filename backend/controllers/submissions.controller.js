@@ -4,6 +4,8 @@ import path from "path";
 import util from "util";
 import { Problem } from "../models/problems.model.js";
 import { TestCase } from "../models/testcases.model.js";
+import { imageName, containerName } from "../constants.js"
+import { containerExists, containerStart, createContainer } from "../scripts/dockerCommands.js";
 
 const execPromise = util.promisify(exec);
 
@@ -35,23 +37,22 @@ const languageConfig = {
     }
 };
 
-async function ensureSandbox(containerName, image = "sandboxed-env") {
+async function ensureSandbox() {
     try {
         // Check if container exists
-        const { stdout } = await execPromise(`docker inspect -f '{{.State.Running}}' ${containerName}`);
+        const { stdout } = await execPromise(containerExists);
         const isRunning = stdout.trim() === "true";
 
         if (!isRunning) {
-            await execPromise(`docker start ${containerName}`);
+            await execPromise(containerStart);
         }
     } catch (err) {
         // Container does not exists, create new
-        await execPromise(`docker run -d --name ${containerName} --network none ${image} tail -f /dev/null`);
+        await execPromise(createContainer);
     }
 }
 
 export const submitSolution = async (req, res) => {
-    const containerName = "sandboxed-env";
     const isolatedFolderName = `sub-${Date.now()}`;
     let testcases;
 
@@ -90,7 +91,7 @@ export const submitSolution = async (req, res) => {
         try {
 
             //check if container is running or not, if not then start it, if not create then create it
-            await ensureSandbox(containerName);
+            await ensureSandbox();
 
             //create a temporary folder on container
             await execPromise(`docker exec ${containerName} mkdir -p /app/${isolatedFolderName}`);

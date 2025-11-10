@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import DescriptionPage from './createcontestpage/DescriptionPage';
+import DescriptionPage from '../createchallengepage/DescriptionPage';
+import Header from '../Header';
+import CreateTestCase from './CreateTestCases';
 
-const CreateContest = () => {
+const CreateChallenge = () => {
     const [activeTab, setActiveTab] = useState("details");
 
     const tabs = [
@@ -15,7 +17,7 @@ const CreateContest = () => {
             case "details":
                 return <DescriptionPage />
             case "testcases":
-                return <p>Testcases will be here.</p>
+                return <CreateTestCase />
             case "stubs":
                 return <p>Stubs will be here.</p>
             default:
@@ -25,6 +27,7 @@ const CreateContest = () => {
 
     return (
         <>
+            <Header />
             <div className='m-4'>
                 {
                     tabs.map((tab, index) => (
@@ -40,4 +43,4 @@ const CreateContest = () => {
     )
 }
 
-export default CreateContest
+export default CreateChallenge
