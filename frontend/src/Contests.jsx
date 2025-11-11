@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './Header'
 import { NavLink } from 'react-router'
+import axios from 'axios';
 
 const Contests = () => {
     return (
