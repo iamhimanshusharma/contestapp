@@ -1,7 +1,7 @@
 import React from "react";
 import ContentContainer from "./ContentContainer";
 
-const DescriptionPage = () => {
+const DescriptionPage = ({ setActiveTab }) => {
     return (
         <div className="flex justify-center items-start min-h-screen  pb-10">
             <div className="lg:w-1/2 md:w-full bg-white p-6 space-y-2">
@@ -11,6 +11,8 @@ const DescriptionPage = () => {
                         type="text"
                         placeholder="Title"
                         className="py-2 px-3 ring-2 ring-gray-200 rounded-md w-full"
+                        name="title"
+                        onChange={onChangeHandler}
                     />
                 </div>
 
@@ -19,6 +21,7 @@ const DescriptionPage = () => {
                     <select
                         name="difficulty"
                         className="py-2 px-3 ring-2 ring-gray-200 rounded-md w-full"
+                        onChange={onChangeHandler}
                     >
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium</option>
@@ -46,8 +49,8 @@ const DescriptionPage = () => {
                     <button className="py-2 px-4 border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition">
                         Save Changes
                     </button>
-                    <button className="py-2 px-4 bg-green-500 text-white text-lg rounded-md shadow hover:bg-green-600 transition">
-                        Submit
+                    <button className="py-2 px-4 bg-green-500 text-white text-lg rounded-md shadow hover:bg-green-600 transition" onClick={() => setActiveTab("testcases")}>
+                        Next
                     </button>
                 </div>
             </div>

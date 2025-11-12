@@ -14,6 +14,7 @@
     "@tailwindcss/vite": "^4.1.16",
     "@uiw/react-markdown-preview": "^5.1.5",
     "@uiw/react-md-editor": "^4.0.8",
+    "animejs": "^4.2.2",
     "axios": "^1.13.1",
     "katex": "^0.16.25",
     "lucide-react": "^0.553.0",

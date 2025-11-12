@@ -1,0 +1,1 @@
+// contest name, contestId, organizer, problems[], start time, end time, start date, end date, totalPoints 
