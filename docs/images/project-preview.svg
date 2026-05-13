@@ -1,0 +1,56 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Contest App Preview</title>
+  <desc id="desc">A stylized preview of the coding platform with navigation, problem editor, contest panel, and community area.</desc>
+  <rect width="1200" height="675" fill="#F3F4F6"/>
+  <rect x="56" y="44" width="1088" height="587" rx="18" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="2"/>
+  <rect x="56" y="44" width="1088" height="72" rx="18" fill="#111827"/>
+  <rect x="56" y="96" width="1088" height="20" fill="#111827"/>
+  <circle cx="98" cy="80" r="9" fill="#EF4444"/>
+  <circle cx="128" cy="80" r="9" fill="#F59E0B"/>
+  <circle cx="158" cy="80" r="9" fill="#22C55E"/>
+  <text x="202" y="87" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Contest App</text>
+  <text x="850" y="84" fill="#D1D5DB" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">Problems</text>
+  <text x="943" y="84" fill="#D1D5DB" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">Contests</text>
+  <text x="1042" y="84" fill="#D1D5DB" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">Community</text>
+
+  <rect x="92" y="152" width="320" height="424" rx="10" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="120" y="192" fill="#111827" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="26" font-weight="700">Two Sum</text>
+  <rect x="120" y="210" width="72" height="26" rx="13" fill="#DCFCE7"/>
+  <text x="139" y="229" fill="#15803D" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700">Easy</text>
+  <rect x="120" y="262" width="244" height="13" rx="6.5" fill="#D1D5DB"/>
+  <rect x="120" y="290" width="214" height="13" rx="6.5" fill="#D1D5DB"/>
+  <rect x="120" y="318" width="260" height="13" rx="6.5" fill="#D1D5DB"/>
+  <rect x="120" y="382" width="112" height="18" rx="9" fill="#111827"/>
+  <rect x="120" y="418" width="248" height="54" rx="8" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="140" y="450" fill="#4B5563" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">1 2</text>
+  <rect x="120" y="494" width="248" height="54" rx="8" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="140" y="526" fill="#4B5563" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">3</text>
+
+  <rect x="444" y="152" width="436" height="424" rx="10" fill="#0F172A"/>
+  <rect x="470" y="180" width="150" height="32" rx="6" fill="#1F2937"/>
+  <text x="492" y="202" fill="#E5E7EB" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">C++</text>
+  <text x="480" y="252" fill="#93C5FD" font-family="Consolas,Monaco,monospace" font-size="18">#include &lt;iostream&gt;</text>
+  <text x="480" y="286" fill="#C4B5FD" font-family="Consolas,Monaco,monospace" font-size="18">using namespace std;</text>
+  <text x="480" y="338" fill="#F9FAFB" font-family="Consolas,Monaco,monospace" font-size="18">int main() {</text>
+  <text x="516" y="372" fill="#F9FAFB" font-family="Consolas,Monaco,monospace" font-size="18">int a, b; cin &gt;&gt; a &gt;&gt; b;</text>
+  <text x="516" y="406" fill="#FDE68A" font-family="Consolas,Monaco,monospace" font-size="18">cout &lt;&lt; a + b;</text>
+  <text x="480" y="440" fill="#F9FAFB" font-family="Consolas,Monaco,monospace" font-size="18">}</text>
+  <rect x="470" y="506" width="96" height="40" rx="8" fill="#22C55E"/>
+  <text x="501" y="532" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="700">Run</text>
+  <rect x="584" y="506" width="120" height="40" rx="8" fill="#2563EB"/>
+  <text x="619" y="532" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="700">Submit</text>
+
+  <rect x="912" y="152" width="196" height="190" rx="10" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="934" y="188" fill="#111827" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="700">Contest</text>
+  <text x="934" y="222" fill="#4B5563" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Status: live</text>
+  <text x="934" y="252" fill="#4B5563" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Duration: 120 min</text>
+  <rect x="934" y="282" width="134" height="34" rx="7" fill="#22C55E"/>
+  <text x="975" y="305" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700">Solve</text>
+
+  <rect x="912" y="372" width="196" height="204" rx="10" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="934" y="408" fill="#111827" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="700">Community</text>
+  <rect x="934" y="432" width="126" height="12" rx="6" fill="#D1D5DB"/>
+  <rect x="934" y="460" width="150" height="12" rx="6" fill="#D1D5DB"/>
+  <rect x="934" y="502" width="132" height="30" rx="7" fill="#111827"/>
+  <text x="976" y="522" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700">Reply</text>
+</svg>
