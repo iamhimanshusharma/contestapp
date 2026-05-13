@@ -48,6 +48,14 @@ const ContestDetail = () => {
 
     const isRegistered = Boolean(user && contest.registeredUsers?.some((userId) => userId === user._id));
     const canOpenProblems = isRegistered && contest.status === "live";
+    const canRegister = contest.status === "upcoming" && !isRegistered;
+    const statusMessage = contest.status === "ended"
+        ? "This contest has ended. Registration is closed."
+        : contest.status === "live"
+            ? "This contest is live. Registration is closed."
+            : isRegistered
+                ? "You are registered. Problems unlock when the contest starts."
+                : "Register before the start time to participate.";
 
     return (
         <>
@@ -66,10 +74,13 @@ const ContestDetail = () => {
                 {message && <p className="text-sm text-red-600">{message}</p>}
 
                 <div className="flex items-center gap-3">
-                    <button onClick={register} className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
-                        {isRegistered ? "Registered" : "Register"}
-                    </button>
-                    {!canOpenProblems && <p className="text-sm text-gray-500">Problems open only for registered users while the contest is live.</p>}
+                    {canRegister && (
+                        <button onClick={register} className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
+                            Register
+                        </button>
+                    )}
+                    {isRegistered && <span className="py-2 px-4 bg-green-100 text-green-700 rounded-md font-medium">Registered</span>}
+                    <p className="text-sm text-gray-500">{statusMessage}</p>
                 </div>
 
                 <div className="space-y-2">

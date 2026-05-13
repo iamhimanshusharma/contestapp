@@ -10,6 +10,7 @@ import SignIn from "./auth/SignIn";
 import LogIn from "./auth/LogIn";
 import ContestDetail from "./ContestDetail";
 import ContestResults from "./ContestResults";
+import Profile from "./Profile";
 
 const App = () => {
 
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/contests/:contestId/results" element={<ContestResults />} />
         <Route path="/contests/:contestId/problems/:problemId" element={<Problem />} />
         <Route path="/community" element={<Community />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/problems/:problemId" element={<Problem />} />
         <Route path="/challenge/create" element={<CreateChallenge />} />
       </Routes>

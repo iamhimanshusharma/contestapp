@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { CheckCircle } from 'lucide-react'
 import { api } from './api';
 import Header from "./Header"
+import { useAuth } from './auth/AuthContext';
 
 const ProblemSet = () => {
     const [problemData, setProblemData] = useState([]);
+    const [solvedProblemIds, setSolvedProblemIds] = useState([]);
+    const { isAuthenticated } = useAuth();
 
     async function loadProblem() {
         try {
@@ -33,6 +37,17 @@ const ProblemSet = () => {
         loadProblem();
     }, [])
 
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setSolvedProblemIds([]);
+            return;
+        }
+
+        api.get("/auth/profile")
+            .then((res) => setSolvedProblemIds(res.data.solvedProblemIds || []))
+            .catch(() => setSolvedProblemIds([]));
+    }, [isAuthenticated]);
+
     return (
         <>
             <Header />
@@ -44,7 +59,10 @@ const ProblemSet = () => {
                 <div key={index} className='border border-gray-300 ring-1 mx-2 my-1 rounded-md py-2'>
                     <NavLink to={`/problems/${item.problemId}`}>
                         <div className='flex items-center justify-around'>
-                            <p className='text-md font-bold'>{item.title}</p>
+                            <p className='text-md font-bold flex items-center gap-2'>
+                                {solvedProblemIds.includes(item.problemId) && <CheckCircle size={18} className="text-green-500" />}
+                                {item.title}
+                            </p>
                             <p className={`${getDifficulty(item.difficulty)} text-sm`}>{item.difficulty}</p>
                         </div>
                     </NavLink >
