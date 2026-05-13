@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import Problem from './Problem'
-import { NavLink, Route, Router, Routes } from 'react-router'
-import axios from 'axios';
+import { NavLink } from 'react-router-dom'
+import { api } from './api';
 import Header from "./Header"
 
 const ProblemSet = () => {
@@ -9,7 +8,7 @@ const ProblemSet = () => {
 
     async function loadProblem() {
         try {
-            const res = await axios.get(`http://localhost:5000/api/problems`);
+            const res = await api.get(`/problems`);
             setProblemData(res.data.problems);
             console.log(res.data.problems);
         } catch (error) {
@@ -37,6 +36,10 @@ const ProblemSet = () => {
     return (
         <>
             <Header />
+            <div className='flex items-center justify-between px-5 py-4'>
+                <p className='text-xl text-gray-600 font-bold'>Problems</p>
+                <NavLink to="/challenge/create" className='text-md font-bold text-green-500 shadow py-2 px-3 rounded-md cursor-pointer ring-2 ring-gray-100'>+ Upload Problem</NavLink>
+            </div>
             {problemData.map((item, index) => (
                 <div key={index} className='border border-gray-300 ring-1 mx-2 my-1 rounded-md py-2'>
                     <NavLink to={`/problems/${item.problemId}`}>

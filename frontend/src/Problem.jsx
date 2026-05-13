@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import UserEditor from "./UserEditor";
 import { Editor } from "@monaco-editor/react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import MarkdownPreview from '@uiw/react-markdown-preview';
+import { api } from "./api";
+import { useAuth } from "./auth/AuthContext";
 
 
 const Problem = () => {
@@ -14,8 +14,9 @@ const Problem = () => {
     const [responseData, setResponseData] = useState([]);
     const [submitResponseData, setSubmitResponseData] = useState();
     const [problemData, setProblemData] = useState({});
-    const [submissionType, setSubmissionType] = useState("none");
-    const { problemId } = useParams();
+    const [isExecuting, setIsExecuting] = useState(false);
+    const { problemId, contestId } = useParams();
+    const { isAuthenticated } = useAuth();
     const [activeTab, setActiveTab] = useState("description");
     const [activeTestcase, setActiveTestcase] = useState(0);
     const [allTestcase, setAllTestcase] = useState([]);
@@ -47,7 +48,12 @@ const Problem = () => {
                     <p className="text-sm my-2">{problemData.constraints}</p>
                 </div>
             case "submission":
-                return submitResponseData ? (submitResponseData?.success ? (<p className="text-xl font-bold text-green-500">{submitResponseData.message}</p>) : (<div className="mt-2">
+                return isExecuting ? (
+                    <div className="flex items-center gap-3 text-blue-700">
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-700"></div>
+                        <p className="font-medium">Submitting your code...</p>
+                    </div>
+                ) : submitResponseData ? (submitResponseData?.success ? (<p className="text-xl font-bold text-green-500">{submitResponseData.message}</p>) : submitResponseData?.failedTestcase ? (<div className="mt-2">
                     <p className="text-xl font-bold text-red-500">Wrong Answer</p>
                     <p className="text-sm font-bold mt-2">Input</p>
                     <input type="text" name="input" id="" disabled value={submitResponseData?.failedTestcase?.input} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
@@ -55,26 +61,103 @@ const Problem = () => {
                     <input type="text" name="input" id="" disabled value={submitResponseData?.failedTestcase?.output} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
                     <p className="text-sm font-bold mt-2">Expected</p>
                     <input type="text" name="input" id="" disabled value={submitResponseData?.failedTestcase?.expected} className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400" />
-                </div>)) : <p className="text-gray-600">Your submission will show here.</p>;
+                </div>) : (<p className="text-xl font-bold text-red-500">{submitResponseData.message}</p>)) : <p className="text-gray-600">Your submission will show here.</p>;
             default:
                 return null;
         }
     };
 
+    const renderTestcasePanel = () => {
+        const testcasesToShow = responseData.length > 0 ? responseData : allTestcase;
+        const showingRunResults = responseData.length > 0;
+        const selectedIndex = Math.min(activeTestcase, Math.max(testcasesToShow.length - 1, 0));
+        const selectedTestcase = testcasesToShow[selectedIndex] || {};
 
-    function handleEditorDidMount(editor, monaco) {
+        return (
+            <div>
+                {isExecuting && (
+                    <div className="mb-3 flex items-center gap-3 rounded-md bg-blue-50 px-4 py-3 text-blue-700">
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-700"></div>
+                        <p className="font-medium">Running your code...</p>
+                    </div>
+                )}
+
+                {isError && (
+                    <div className="mb-3 rounded-md bg-red-50 px-4 py-3">
+                        <p className="text-xl text-red-600 font-bold">
+                            {getError?.message}
+                        </p>
+                        <p className="text-sm text-red-600 mt-2 whitespace-pre-wrap">{getError?.error}</p>
+                    </div>
+                )}
+
+                {testcasesToShow.length > 0 ? (
+                    <>
+                        <div className="flex w-full gap-3 overflow-auto p-2">
+                            {testcasesToShow.map((testcase, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setActiveTestcase(index)}
+                                    className={`${showingRunResults
+                                        ? testcase.passed
+                                            ? "ring-green-500 text-green-500"
+                                            : "ring-red-500 text-red-500"
+                                        : "text-gray-700"
+                                        } ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer ${selectedIndex === index
+                                            ? "bg-gray-200"
+                                            : "hover:bg-gray-300"
+                                        }`}
+                                >
+                                    {`Case ${index + 1}`}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="w-full bg-white shadow mt-2">
+                            <p className="text-sm font-bold mt-2">Input</p>
+                            <textarea
+                                disabled
+                                value={selectedTestcase.input || ""}
+                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400 resize-none"
+                                rows={3}
+                            />
+                            <p className="text-sm font-bold mt-2">Output</p>
+                            <textarea
+                                disabled
+                                value={showingRunResults ? selectedTestcase.output || "" : "Run code to see output"}
+                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400 resize-none"
+                                rows={3}
+                            />
+                            <p className="text-sm font-bold mt-2">Expected</p>
+                            <textarea
+                                disabled
+                                value={selectedTestcase.expected || ""}
+                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400 resize-none"
+                                rows={3}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <p className="text-gray-500">Testcases will show here.</p>
+                )}
+            </div>
+        );
+    };
+
+
+    function handleEditorDidMount(editor) {
         editorRef.current = editor;
     }
 
     function onChangeHandler(e) {
-        const { name, value } = e.target;
+        const { value } = e.target;
 
         setLanguage(value);
     }
 
     async function loadProblem(pId) {
         try {
-            const res = await axios.get(`http://localhost:5000/api/problems/${pId}`);
+            const res = await api.get(`/problems/${pId}`);
 
             if (!res.data.error) {
                 setIsError(false);
@@ -142,9 +225,18 @@ const Problem = () => {
             window.removeEventListener("mouseup", varHandleMouseUp);
             window.removeEventListener("mousemove", varHandleMouseMove);
         };
-    }, []);
+    }, [problemId]);
 
     async function runCode(type) {
+        if (!isAuthenticated) {
+            setActiveTab("submission");
+            setSubmitResponseData({
+                success: false,
+                message: "Login is required before running or submitting code"
+            });
+            return;
+        }
+
         const code = editorRef.current.getValue();
         const language = document.getElementById("language").value;
 
@@ -152,13 +244,18 @@ const Problem = () => {
 
 
         try {
-            setSubmissionType(type);
-            if (type === "hidden") setActiveTab("submission");
-            const res = await axios.post("http://localhost:5000/api/submit", {
+            setIsExecuting(true);
+            setIsError(false);
+            if (type === "hidden") {
+                setActiveTab("submission");
+                setSubmitResponseData();
+            }
+            const res = await api.post("/submit", {
                 type,
                 language,
                 problemId,
-                code
+                code,
+                contestId
             });
 
             if (!res.data.error) {
@@ -166,7 +263,10 @@ const Problem = () => {
                     setSubmitResponseData(res.data)
                 }
                 setIsError(false);
-                setResponseData(res.data.results);
+                if (res.data.results?.length > 0) {
+                    setResponseData(res.data.results);
+                    setActiveTestcase(0);
+                }
                 console.log(res.data);
             } else {
                 setIsError(true);
@@ -175,7 +275,13 @@ const Problem = () => {
             }
 
         } catch (err) {
-            console.error(err);
+            setIsError(true);
+            setError(err.response?.data || {
+                message: "Execution failed",
+                error: err.message
+            });
+        } finally {
+            setIsExecuting(false);
         }
     }
 
@@ -197,16 +303,21 @@ const Problem = () => {
     return (
         <>
             <div className="gap-1 h-screen flex flex-col">
-                <div className="flex items-center justify-center border-2 border-gray-300">
+                <div className="flex items-center justify-center border-2 border-gray-300 relative">
+                    <NavLink to={contestId ? `/contests/${contestId}` : "/problems"} className="absolute left-4 text-sm text-blue-600">
+                        Back
+                    </NavLink>
                     <button
-                        className="rounded-md shadow-md cursor-pointer m-1 p-1 ring-3 ring-gray-100"
+                        className="rounded-md shadow-md cursor-pointer m-1 p-1 ring-3 ring-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={() => runCode("sample")}
+                        disabled={isExecuting}
                     >
                         <img src="../run.svg" alt="" className="h-7 w-7" />
                     </button>
                     <button
-                        className="py-1 px-2 rounded-md shadow-md cursor-pointer m-1 ring-3 ring-gray-100"
+                        className="py-1 px-2 rounded-md shadow-md cursor-pointer m-1 ring-3 ring-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={() => runCode("hidden")}
+                        disabled={isExecuting}
                     >
                         <div className="flex items-center justify-center gap-2">
                             <img src="../upload1.svg" alt="" className="h-7 w-7" />
@@ -282,99 +393,7 @@ const Problem = () => {
                             ></div>
 
                             <div className="border-2 border-gray-300 rounded-md overflow-auto py-2 px-4 flex-1">
-                                {isError ? (
-                                    <div>
-                                        <p className="text-xl text-red-600 font-bold">
-                                            {getError?.message}
-                                        </p>
-                                        <p className="text-sm text-red-600 mt-2">{getError?.error}</p>
-                                    </div>
-                                ) : submissionType !== "none" ? (
-                                    <div>
-                                        <div className="flex w-full gap-3 overflow-auto p-2">
-                                            {responseData.map((testcase, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setActiveTestcase(index)}
-                                                    className={`${testcase.passed
-                                                        ? "ring-green-500 text-green-500"
-                                                        : "ring-red-500 text-red-500"
-                                                        } ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer ${activeTestcase === index
-                                                            ? "bg-gray-200"
-                                                            : "hover:bg-gray-300"
-                                                        }`}
-                                                >
-                                                    {`Case ${index}`}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        <div className="w-full bg-white shadow mt-2">
-                                            <p className="text-sm font-bold mt-2">Input</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={responseData[activeTestcase]?.input || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                            <p className="text-sm font-bold mt-2">Output</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={responseData[activeTestcase]?.output || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                            <p className="text-sm font-bold mt-2">Expected</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={responseData[activeTestcase]?.expected || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <div className="flex w-full gap-3 overflow-auto p-2">
-                                            {allTestcase.map((testcase, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setActiveTestcase(index)}
-                                                    className={`ring-2 px-2 flex-1 py-1 text-center rounded-md cursor-pointer ${activeTestcase === index
-                                                        ? "text-gray-700 bg-gray-200"
-                                                        : "text-gray-700 hover:text-gray-500"
-                                                        }`}
-                                                >
-                                                    {`Case ${index}`}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        <div className="w-full bg-white shadow mt-2">
-                                            <p className="text-sm font-bold mt-2">Input</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={allTestcase[activeTestcase]?.input || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                            <p className="text-sm font-bold mt-2">Output</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={allTestcase[activeTestcase]?.output || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                            <p className="text-sm font-bold mt-2">Expected</p>
-                                            <input
-                                                type="text"
-                                                disabled
-                                                value={allTestcase[activeTestcase]?.expected || ""}
-                                                className="ring-2 w-full px-2 py-1 rounded-md mt-1 ring-gray-400"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
+                                {renderTestcasePanel()}
                             </div>
                         </div>
                     </div>

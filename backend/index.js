@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import submissionRouter from "./routes/submissions.route.js";
 import problemRouter from "./routes/problems.route.js";
+import contestRouter from "./routes/contests.route.js";
+import authRouter from "./routes/auth.route.js";
+import communityRouter from "./routes/community.route.js";
 import { dbConnect } from "./db/db.js"
 import dotenv from "dotenv";
 dotenv.config({});
@@ -18,6 +21,9 @@ app.use(cors({
 
 app.use("/api", submissionRouter);
 app.use("/api", problemRouter);
+app.use("/api", contestRouter);
+app.use("/api", authRouter);
+app.use("/api", communityRouter);
 
 app.listen(5000, () => {
     dbConnect();

@@ -1,10 +1,10 @@
 import { exec, spawn } from "child_process";
-import fs from "fs";
-import path from "path";
 import util from "util";
 import { Problem } from "../models/problems.model.js";
 import { TestCase } from "../models/testcases.model.js";
-import { imageName, containerName } from "../constants.js"
+import { Contest } from "../models/contests.model.js";
+import { Submission } from "../models/submissions.model.js";
+import { containerName } from "../constants.js"
 import { containerExists, containerStart, createContainer } from "../scripts/dockerCommands.js";
 
 const execPromise = util.promisify(exec);
@@ -52,21 +52,113 @@ async function ensureSandbox() {
     }
 }
 
+async function cleanupSandboxFolder(folderName) {
+    try {
+        await execPromise(`docker exec ${containerName} rm -rf /app/${folderName}`);
+    } catch (error) {
+        // Cleanup is best effort; the original execution error is more useful to return.
+    }
+}
+
+function dockerExecWithInput(args, input = "") {
+    return new Promise((resolve, reject) => {
+        const child = spawn("docker", args);
+        let stdout = "";
+        let stderr = "";
+
+        child.stdout.on("data", (data) => {
+            stdout += data.toString();
+        });
+
+        child.stderr.on("data", (data) => {
+            stderr += data.toString();
+        });
+
+        child.on("error", (error) => {
+            reject({ stderr: error.message });
+        });
+
+        child.on("close", (code) => {
+            if (code === 0) {
+                resolve({ stdout, stderr });
+            } else {
+                reject({ stdout, stderr, code });
+            }
+        });
+
+        child.stdin.write(input);
+        child.stdin.end();
+    });
+}
+
 export const submitSolution = async (req, res) => {
     const isolatedFolderName = `sub-${Date.now()}`;
     let testcases;
+    let contest = null;
+    let problem;
 
     try {
-        const { type, language, problemId, code } = req.body;
+        const { type, language, problemId, code, contestId } = req.body;
 
         const lang = languageConfig[language];
+        if (!lang) {
+            return res.status(400).json({
+                success: false,
+                message: "Unsupported language"
+            });
+        }
 
-        const problem = await Problem.findOne({ problemId });
+        problem = await Problem.findOne({ problemId });
         if (!problem) {
             return res.status(404).json({
                 success: false,
                 message: "Problem not found"
             });
+        }
+
+        if (contestId) {
+            contest = await Contest.findOne({ contestId });
+
+            if (!contest) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Contest not found"
+                });
+            }
+
+            const now = new Date();
+            const start = new Date(contest.startTime);
+            const end = new Date(start.getTime() + contest.durationMinutes * 60 * 1000);
+            const isRegistered = contest.registeredUsers.some((userId) => userId.equals(req.user._id));
+            const contestHasProblem = contest.problems.some((contestProblemId) => contestProblemId.equals(problem._id));
+
+            if (!isRegistered) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Register for this contest before it starts to submit"
+                });
+            }
+
+            if (!contestHasProblem) {
+                return res.status(400).json({
+                    success: false,
+                    message: "This problem is not part of the contest"
+                });
+            }
+
+            if (now < start) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Contest has not started yet"
+                });
+            }
+
+            if (now > end) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Contest is over"
+                });
+            }
         }
 
         if (type === "sample") {
@@ -85,6 +177,12 @@ export const submitSolution = async (req, res) => {
             ]);
         } else {
             const getTestcases = await TestCase.findOne({ problemId: problem._id });
+            if (!getTestcases) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Testcases not found"
+                });
+            }
             testcases = getTestcases.testcases;
         }
 
@@ -96,11 +194,10 @@ export const submitSolution = async (req, res) => {
             //create a temporary folder on container
             await execPromise(`docker exec ${containerName} mkdir -p /app/${isolatedFolderName}`);
 
-            const child = spawn("docker", ["exec", "-i", containerName, "sh", "-c", `tee /app/${isolatedFolderName}/${lang.file} > /dev/null`]);
-
-            child.stdin.write(code);
-
-            child.stdin.end();
+            await dockerExecWithInput(
+                ["exec", "-i", containerName, "sh", "-c", `cat > /app/${isolatedFolderName}/${lang.file}`],
+                code
+            );
 
             //compiling the code
             if (lang.compile) {
@@ -109,71 +206,83 @@ export const submitSolution = async (req, res) => {
                 );
             }
         } catch (err) {
+            await cleanupSandboxFolder(isolatedFolderName);
             return res.status(200).json({
                 success: false,
                 message: "Compilation error",
-                error: err.stderr
+                error: err.stderr || err.message || "Could not compile code"
             });
         }
 
         const results = [];
         let allPassed = true;
+        let failedTestcase = null;
 
         for (const tc of testcases) {
             try {
-                const safeInput = tc.input.replace(/"/g, '\\"');
-                const { stdout } = await execPromise(
-                    `printf "${safeInput}" | docker exec -i ${containerName} sh -c "cd /app/${isolatedFolderName} && ${lang.run}"`
+                const { stdout } = await dockerExecWithInput(
+                    ["exec", "-i", containerName, "sh", "-c", `cd /app/${isolatedFolderName} && timeout 5s ${lang.run}`],
+                    tc.input
                 );
 
                 const output = stdout.trim();
                 const passed = output === tc.expected.trim();
 
-                if (!passed && type === "hidden" && tc.testcaseType === "hidden") {
-                    return res.status(200).json({
-                        success: false,
-                        message: "Testcase failed",
-                        failedTestcase: {
-                            input: safeInput,
-                            output,
-                            expected: tc.expected.trim(),
-                            passed: false
-                        },
-                        results: results
-                    })
-                };
+                if (!passed && !failedTestcase) {
+                    failedTestcase = {
+                        input: tc.input,
+                        output,
+                        expected: tc.expected.trim(),
+                        passed: false
+                    };
+                }
 
                 if (tc.testcaseType.trim() === "sample") results.push({ input: tc.input, output, expected: tc.expected.trim(), passed });
                 if (!passed) allPassed = false;
 
             } catch (err) {
+                await cleanupSandboxFolder(isolatedFolderName);
                 return res.status(200).json({
                     success: false,
                     message: "Runtime error",
-                    error: err.stderr
+                    error: err.stderr || err.stdout || "Program did not finish successfully"
                 })
-                allPassed = false;
             }
         }
 
-        await execPromise(`docker exec ${containerName} rm -rf /app/${isolatedFolderName}`);
+        await cleanupSandboxFolder(isolatedFolderName);
 
+
+        if (type === "hidden") {
+            const score = contest && allPassed ? contest.totalPoints / contest.problems.length : allPassed ? 1 : 0;
+
+            await Submission.create({
+                user: req.user._id,
+                problem: problem._id,
+                contest: contest?._id || null,
+                language,
+                code,
+                verdict: allPassed ? "Accepted" : "Wrong Answer",
+                passed: allPassed,
+                score
+            });
+        }
 
         return res.status(200).json({
-            success: true,
+            success: allPassed,
             message: allPassed ? "Accepted" : "Wrong Answer",
             results,
+            failedTestcase
         });
 
     } catch (err) {
 
-        // delete the created folder, if exists
-        await execPromise(`docker exec ${containerName} rm -rf /app/${isolatedFolderName}`);
+        await cleanupSandboxFolder(isolatedFolderName);
 
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: err.stderr
+            error: err.stderr || err.message || "Execution failed"
         });
     }
 };

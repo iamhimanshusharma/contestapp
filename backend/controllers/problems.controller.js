@@ -76,15 +76,22 @@ export const uploadProblems = async (req, res) => {
         const validateProblemId = await Problem.findOne({ problemId: problemId });
 
         if (validateProblemId) {
-            return res.status(200).json({
-                success: true,
+            return res.status(409).json({
+                success: false,
                 message: "Problem Already Exists",
                 problem: validateProblemId
             })
         }
 
         const response = await Problem.create({
-            problemId, title, difficulty, description, input, output, constraints
+            problemId,
+            title,
+            difficulty,
+            description,
+            input,
+            output,
+            constraints,
+            createdby: req.user?._id
         })
 
         if (!response) {

@@ -1,0 +1,98 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import Header from "./Header";
+import { api } from "./api";
+import { useAuth } from "./auth/AuthContext";
+
+const ContestDetail = () => {
+    const { contestId } = useParams();
+    const { user, isAuthenticated } = useAuth();
+    const [contest, setContest] = useState(null);
+    const [message, setMessage] = useState("");
+
+    const loadContest = useCallback(() => {
+        api.get(`/contests/${contestId}`)
+            .then((res) => setContest(res.data.contest))
+            .catch((error) => setMessage(error.response?.data?.message || "Could not load contest"));
+    }, [contestId]);
+
+    useEffect(() => {
+        loadContest();
+    }, [loadContest]);
+
+    const register = async () => {
+        setMessage("");
+
+        if (!isAuthenticated) {
+            setMessage("Login is required before registering");
+            return;
+        }
+
+        try {
+            await api.post(`/contests/${contestId}/register`);
+            setMessage("Registered for contest");
+            loadContest();
+        } catch (error) {
+            setMessage(error.response?.data?.message || "Registration failed");
+        }
+    };
+
+    if (!contest) {
+        return (
+            <>
+                <Header />
+                <p className="p-5 text-gray-500">{message || "Loading contest..."}</p>
+            </>
+        );
+    }
+
+    const isRegistered = Boolean(user && contest.registeredUsers?.some((userId) => userId === user._id));
+    const canOpenProblems = isRegistered && contest.status === "live";
+
+    return (
+        <>
+            <Header />
+            <div className="max-w-4xl mx-auto p-6 space-y-5">
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <p className="text-3xl font-bold text-gray-700">{contest.contestName}</p>
+                        <p className="text-gray-500 mt-1">{contest.status} - starts {new Date(contest.startTime).toLocaleString()} - {contest.durationMinutes} min</p>
+                    </div>
+                    <NavLink to={`/contests/${contest.contestId}/results`} className="py-2 px-4 bg-gray-700 text-white rounded-md shadow">
+                        Results
+                    </NavLink>
+                </div>
+
+                {message && <p className="text-sm text-red-600">{message}</p>}
+
+                <div className="flex items-center gap-3">
+                    <button onClick={register} className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
+                        {isRegistered ? "Registered" : "Register"}
+                    </button>
+                    {!canOpenProblems && <p className="text-sm text-gray-500">Problems open only for registered users while the contest is live.</p>}
+                </div>
+
+                <div className="space-y-2">
+                    <p className="text-xl font-bold text-gray-700">Problems</p>
+                    {contest.problems.map((problem) => (
+                        <div key={problem._id} className="ring-1 ring-gray-200 rounded-md p-3 flex items-center justify-between">
+                            <div>
+                                <p className="font-bold">{problem.title}</p>
+                                <p className="text-sm text-gray-500">{problem.problemId} - {problem.difficulty}</p>
+                            </div>
+                            {canOpenProblems ? (
+                                <NavLink to={`/contests/${contest.contestId}/problems/${problem.problemId}`} className="text-blue-600 font-medium">
+                                    Solve
+                                </NavLink>
+                            ) : (
+                                <span className="text-gray-400">Locked</span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default ContestDetail;
