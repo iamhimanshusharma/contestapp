@@ -76,8 +76,8 @@ const CreateChallenge = () => {
     return (
         <>
             <Header />
-            <form onSubmit={onSubmit} className="max-w-4xl mx-auto p-6 space-y-5">
-                <div className="flex items-center justify-between">
+            <form onSubmit={onSubmit} className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-2xl font-bold text-gray-700">Upload Problem</p>
                     <button className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition cursor-pointer">
                         Upload
@@ -135,7 +135,7 @@ const CreateChallenge = () => {
                     </div>
                 ))}
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xl font-bold text-gray-700">Testcases</p>
                     <button type="button" onClick={addTestcase} className="py-2 px-3 text-green-600 shadow rounded-md ring-2 ring-gray-100 cursor-pointer">
                         + Add Testcase
@@ -145,7 +145,7 @@ const CreateChallenge = () => {
                 <div className="space-y-4">
                     {testcases.map((testcase, index) => (
                         <div key={index} className="ring-1 ring-gray-200 rounded-md p-4">
-                            <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center justify-between gap-3 mb-3">
                                 <p className="font-bold text-gray-600">Case {index + 1}</p>
                                 {testcases.length > 1 && (
                                     <button type="button" onClick={() => removeTestcase(index)} className="text-red-500 cursor-pointer">

@@ -60,10 +60,10 @@ const ContestDetail = () => {
     return (
         <>
             <Header />
-            <div className="max-w-4xl mx-auto p-6 space-y-5">
-                <div className="flex items-start justify-between gap-4">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-3xl font-bold text-gray-700">{contest.contestName}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-700">{contest.contestName}</p>
                         <p className="text-gray-500 mt-1">{contest.status} - starts {new Date(contest.startTime).toLocaleString()} - {contest.durationMinutes} min</p>
                     </div>
                     <NavLink to={`/contests/${contest.contestId}/results`} className="py-2 px-4 bg-gray-700 text-white rounded-md shadow">
@@ -73,7 +73,7 @@ const ContestDetail = () => {
 
                 {message && <p className="text-sm text-red-600">{message}</p>}
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     {canRegister && (
                         <button onClick={register} className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
                             Register
@@ -86,7 +86,7 @@ const ContestDetail = () => {
                 <div className="space-y-2">
                     <p className="text-xl font-bold text-gray-700">Problems</p>
                     {contest.problems.map((problem) => (
-                        <div key={problem._id} className="ring-1 ring-gray-200 rounded-md p-3 flex items-center justify-between">
+                        <div key={problem._id} className="ring-1 ring-gray-200 rounded-md p-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p className="font-bold">{problem.title}</p>
                                 <p className="text-sm text-gray-500">{problem.problemId} - {problem.difficulty}</p>

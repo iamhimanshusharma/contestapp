@@ -63,10 +63,10 @@ const Community = () => {
         <>
             <Header />
             <main className="min-h-screen bg-gray-50">
-                <div className="max-w-5xl mx-auto px-6 py-8">
-                    <div className="flex items-start justify-between gap-5 mb-6">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                    <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
                         <div>
-                            <p className="text-3xl font-bold text-gray-800">Community</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800">Community</p>
                             <p className="text-gray-600 mt-1">Ask coding questions, discuss edge cases, and help other users unblock submissions.</p>
                         </div>
                         {user && <p className="text-sm text-gray-500 shrink-0">Posting as @{user.username}</p>}
@@ -99,7 +99,7 @@ const Community = () => {
                     <div className="space-y-4">
                         {posts.map((post) => (
                             <article key={post._id} className="bg-white rounded-md p-5 ring-1 ring-gray-200">
-                                <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                                     <div>
                                         <p className="text-xl font-bold text-gray-800">{post.title}</p>
                                         <p className="text-sm text-gray-500 mt-1">
@@ -121,7 +121,7 @@ const Community = () => {
                                     ))}
                                 </div>
 
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 grid gap-2 sm:flex">
                                     <input
                                         value={replyText[post._id] || ""}
                                         onChange={(e) => setReplyText({ ...replyText, [post._id]: e.target.value })}

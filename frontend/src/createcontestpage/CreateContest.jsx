@@ -89,8 +89,8 @@ const CreateContest = () => {
     return (
         <>
             <Header />
-            <form onSubmit={onSubmit} className="max-w-4xl mx-auto p-6 space-y-5">
-                <div className="flex items-center justify-between">
+            <form onSubmit={onSubmit} className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-2xl text-gray-700 font-bold">Create Contest</p>
                     <button className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition cursor-pointer">
                         Create
@@ -157,7 +157,7 @@ const CreateContest = () => {
                 </div>
 
                 <div>
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-xl text-gray-700 font-bold">Problems</p>
                         <p className="text-sm text-gray-500">{selectedProblems.length} selected</p>
                     </div>
@@ -169,7 +169,7 @@ const CreateContest = () => {
                     />
                     <div className="space-y-2">
                         {filteredProblems.map((problem) => (
-                            <label key={problem._id} className="flex items-center justify-between ring-1 ring-gray-200 rounded-md p-3 cursor-pointer">
+                            <label key={problem._id} className="flex items-center justify-between gap-3 ring-1 ring-gray-200 rounded-md p-3 cursor-pointer">
                                 <div>
                                     <p className="font-bold">{problem.title}</p>
                                     <p className="text-sm text-gray-500">{problem.problemId} - {problem.difficulty}</p>

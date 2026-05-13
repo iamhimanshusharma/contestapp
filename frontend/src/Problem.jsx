@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
 import { NavLink, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import { api } from "./api";
 import { useAuth } from "./auth/AuthContext";
+import UserAvatar from "./UserAvatar";
 
 
 const Problem = () => {
@@ -16,7 +18,7 @@ const Problem = () => {
     const [problemData, setProblemData] = useState({});
     const [isExecuting, setIsExecuting] = useState(false);
     const { problemId, contestId } = useParams();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [activeTab, setActiveTab] = useState("description");
     const [activeTestcase, setActiveTestcase] = useState(0);
     const [allTestcase, setAllTestcase] = useState([]);
@@ -302,10 +304,15 @@ const Problem = () => {
 
     return (
         <>
-            <div className="gap-1 h-screen flex flex-col">
-                <div className="flex items-center justify-center border-2 border-gray-300 relative">
-                    <NavLink to={contestId ? `/contests/${contestId}` : "/problems"} className="absolute left-4 text-sm text-blue-600">
-                        Back
+            <div className="gap-1 min-h-screen md:h-screen flex flex-col">
+                <div className="flex items-center justify-center border-2 border-gray-300 relative min-h-14">
+                    <NavLink
+                        to={contestId ? `/contests/${contestId}` : "/problems"}
+                        className="absolute left-4 rounded-md p-2 text-gray-700 ring-1 ring-gray-300 hover:bg-gray-100"
+                        aria-label="Back"
+                        title="Back"
+                    >
+                        <ArrowLeft size={20} />
                     </NavLink>
                     <button
                         className="rounded-md shadow-md cursor-pointer m-1 p-1 ring-3 ring-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -324,11 +331,16 @@ const Problem = () => {
                             <p className="text-lg text-green-500 font-bold">Submit</p>
                         </div>
                     </button>
+                    {user && (
+                        <NavLink to="/profile" className="absolute right-4" aria-label="Profile">
+                            <UserAvatar user={user} size="sm" />
+                        </NavLink>
+                    )}
                 </div>
 
-                <div ref={containerRef} className="flex w-full flex-1 overflow-hidden">
+                <div ref={containerRef} className="problem-workspace flex flex-col w-full flex-1 overflow-auto md:flex-row md:overflow-hidden">
                     <div
-                        className="border-2 border-gray-300 rounded-md flex flex-col"
+                        className="problem-pane border-2 border-gray-300 rounded-md flex flex-col min-h-[42vh] md:min-h-0"
                         style={{ width: `${leftWidth}%` }}
                     >
                         <div className="flex border-b border-gray-300">
@@ -352,14 +364,14 @@ const Problem = () => {
                     </div>
 
                     <div
-                        className="w-1 hover:bg-blue-700 cursor-col-resize"
+                        className="hidden w-1 hover:bg-blue-700 cursor-col-resize md:block"
                         onMouseDown={handleMouseDown}
                     ></div>
 
-                    <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 flex flex-col overflow-visible md:overflow-hidden">
                         <div ref={varContainerRef} className="flex flex-col h-full w-full">
                             <div
-                                className="border-2 border-gray-300 rounded-md flex flex-col"
+                                className="editor-pane border-2 border-gray-300 rounded-md flex flex-col min-h-[50vh] md:min-h-0"
                                 style={{ height: `${upHeight}%` }}
                             >
                                 <div className="px-2 pt-2">
@@ -388,11 +400,11 @@ const Problem = () => {
                             </div>
 
                             <div
-                                className="h-1 hover:bg-blue-700 cursor-row-resize"
+                                className="hidden h-1 hover:bg-blue-700 cursor-row-resize md:block"
                                 onMouseDown={varHandleMouseDown}
                             ></div>
 
-                            <div className="border-2 border-gray-300 rounded-md overflow-auto py-2 px-4 flex-1">
+                            <div className="result-pane border-2 border-gray-300 rounded-md overflow-auto py-2 px-4 flex-1 min-h-[38vh] md:min-h-0">
                                 {renderTestcasePanel()}
                             </div>
                         </div>

@@ -158,7 +158,7 @@ export const profile = async (req, res) => {
     try {
         const submissions = await Submission.find({ user: req.user._id })
             .populate("problem", "problemId title difficulty")
-            .populate("contest", "contestId contestName totalPoints")
+            .populate("contest", "contestId contestName totalPoints startTime")
             .sort({ createdAt: -1 });
 
         const solvedMap = new Map();
@@ -223,12 +223,14 @@ export const profile = async (req, res) => {
             });
         }
 
-        const contestScores = Array.from(contestMap.values()).map((entry) => ({
-            contest: entry.contest,
-            score: entry.score,
-            solved: entry.solved,
-            problems: Object.values(entry.problems)
-        }));
+        const contestScores = Array.from(contestMap.values())
+            .map((entry) => ({
+                contest: entry.contest,
+                score: entry.score,
+                solved: entry.solved,
+                problems: Object.values(entry.problems)
+            }))
+            .sort((a, b) => new Date(a.contest.startTime) - new Date(b.contest.startTime));
 
         return res.status(200).json({
             success: true,

@@ -51,14 +51,14 @@ const ProblemSet = () => {
     return (
         <>
             <Header />
-            <div className='flex items-center justify-between px-5 py-4'>
+            <div className='flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
                 <p className='text-xl text-gray-600 font-bold'>Problems</p>
-                <NavLink to="/challenge/create" className='text-md font-bold text-green-500 shadow py-2 px-3 rounded-md cursor-pointer ring-2 ring-gray-100'>+ Upload Problem</NavLink>
+                <NavLink to="/challenge/create" className='text-center text-md font-bold text-green-500 shadow py-2 px-3 rounded-md cursor-pointer ring-2 ring-gray-100'>+ Upload Problem</NavLink>
             </div>
             {problemData.map((item, index) => (
                 <div key={index} className='border border-gray-300 ring-1 mx-2 my-1 rounded-md py-2'>
                     <NavLink to={`/problems/${item.problemId}`}>
-                        <div className='flex items-center justify-around'>
+                        <div className='flex items-center justify-between gap-3 px-4'>
                             <p className='text-md font-bold flex items-center gap-2'>
                                 {solvedProblemIds.includes(item.problemId) && <CheckCircle size={18} className="text-green-500" />}
                                 {item.title}

@@ -1,8 +1,46 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Header from "./Header";
 import { api } from "./api";
 import { useAuth } from "./auth/AuthContext";
+
+const ContestScoreLineChart = ({ scores = [] }) => {
+    const width = 720;
+    const height = 280;
+    const padding = 42;
+    const maxScore = Math.max(...scores.map((entry) => entry.score), 1);
+    const points = scores.map((entry, index) => {
+        const x = scores.length === 1
+            ? width / 2
+            : padding + (index * (width - padding * 2)) / (scores.length - 1);
+        const y = height - padding - (entry.score / maxScore) * (height - padding * 2);
+        return { ...entry, x, y };
+    });
+    const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+
+    return (
+        <div className="overflow-x-auto">
+            <svg viewBox={`0 0 ${width} ${height}`} className="min-w-[620px] w-full h-auto" role="img" aria-label="Contest score line graph">
+                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#CBD5E1" strokeWidth="2" />
+                <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#CBD5E1" strokeWidth="2" />
+                <text x={padding} y={padding - 14} fill="currentColor" fontSize="13">{maxScore} pts</text>
+                <text x={padding} y={height - 12} fill="currentColor" fontSize="13">0 pts</text>
+
+                {points.length > 1 && <path d={linePath} fill="none" stroke="#22C55E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />}
+
+                {points.map((point, index) => (
+                    <g key={point.contest._id || index}>
+                        <title>{`${point.contest.contestName}: ${point.score} pts`}</title>
+                        <circle cx={point.x} cy={point.y} r="8" fill="#22C55E" stroke="#FFFFFF" strokeWidth="3" />
+                        <text x={point.x} y={height - 16} textAnchor="middle" fill="currentColor" fontSize="12">
+                            {index + 1}
+                        </text>
+                    </g>
+                ))}
+            </svg>
+        </div>
+    );
+};
 
 const Profile = () => {
     const { user, isAuthenticated } = useAuth();
@@ -17,16 +55,11 @@ const Profile = () => {
             .catch((error) => setMessage(error.response?.data?.message || "Could not load profile"));
     }, [isAuthenticated]);
 
-    const maxScore = useMemo(() => {
-        const scores = profile?.contestScores?.map((entry) => entry.score) || [];
-        return Math.max(...scores, 1);
-    }, [profile]);
-
     if (!isAuthenticated) {
         return (
             <>
                 <Header />
-                <div className="max-w-4xl mx-auto p-6">
+                <div className="max-w-4xl mx-auto p-4 sm:p-6">
                     <p className="text-xl font-bold text-gray-700">Login to view your profile.</p>
                     <NavLink to="/login" className="inline-block mt-4 py-2 px-4 bg-green-500 text-white rounded-md">Login</NavLink>
                 </div>
@@ -38,9 +71,9 @@ const Profile = () => {
         <>
             <Header />
             <main className="min-h-screen bg-gray-50">
-                <div className="max-w-6xl mx-auto p-6 space-y-6">
+                <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
                     <div className="bg-white rounded-md p-6 ring-1 ring-gray-200">
-                        <p className="text-3xl font-bold text-gray-800">@{user?.username}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-800">@{user?.username}</p>
                         <p className="text-gray-500 mt-1">{user?.email}</p>
                         <p className="text-gray-500 mt-1">Theme preference: {user?.theme || "light"}</p>
                     </div>
@@ -63,22 +96,10 @@ const Profile = () => {
                     </div>
 
                     <section className="bg-white rounded-md p-6 ring-1 ring-gray-200">
-                        <p className="text-2xl font-bold text-gray-800 mb-4">Contest Scores</p>
+                        <p className="text-2xl font-bold text-gray-800 mb-1">Contest Ratings</p>
+                        <p className="text-sm text-gray-500 mb-4">Each point is one contest. Hover a point to see the score.</p>
                         <div className="space-y-4">
-                            {profile?.contestScores?.map((entry) => (
-                                <div key={entry.contest._id}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="font-medium">{entry.contest.contestName}</span>
-                                        <span>{entry.score} pts</span>
-                                    </div>
-                                    <div className="h-5 bg-gray-200 rounded-md overflow-hidden">
-                                        <div
-                                            className="h-full bg-green-500"
-                                            style={{ width: `${Math.max((entry.score / maxScore) * 100, 4)}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            ))}
+                            {profile?.contestScores?.length > 0 && <ContestScoreLineChart scores={profile.contestScores} />}
                             {profile?.contestScores?.length === 0 && <p className="text-gray-500">No contest submissions yet.</p>}
                         </div>
                     </section>

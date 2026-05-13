@@ -29,24 +29,24 @@ const Home = () => {
             <Header />
             <main className="min-h-screen bg-gray-50">
                 <section className="bg-white border-b border-gray-200">
-                    <div className="max-w-6xl mx-auto px-6 py-14 grid lg:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 sm:gap-10 items-center">
                         <div>
                             <p className="text-sm font-bold text-green-600 uppercase">Code, compete, discuss</p>
-                            <h1 className="text-5xl font-bold text-gray-900 mt-3 leading-tight">
+                            <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mt-3 leading-tight">
                                 Practice problems and run contests from one focused workspace.
                             </h1>
                             <p className="text-lg text-gray-600 mt-5 max-w-2xl">
                                 Upload challenges, solve in the editor, register for contests before they start, and compare results after submissions are judged.
                             </p>
-                            <div className="flex flex-wrap gap-3 mt-8">
-                                <NavLink to="/problems" className="py-3 px-5 bg-green-500 text-white rounded-md shadow hover:bg-green-600">
+                            <div className="grid gap-3 mt-8 sm:flex sm:flex-wrap">
+                                <NavLink to="/problems" className="text-center py-3 px-5 bg-green-500 text-white rounded-md shadow hover:bg-green-600">
                                     Start Solving
                                 </NavLink>
-                                <NavLink to="/contests" className="py-3 px-5 bg-gray-900 text-white rounded-md shadow hover:bg-black">
+                                <NavLink to="/contests" className="text-center py-3 px-5 bg-gray-900 text-white rounded-md shadow hover:bg-black">
                                     View Contests
                                 </NavLink>
                                 {!isAuthenticated && (
-                                    <NavLink to="/signin" className="py-3 px-5 bg-white text-gray-800 rounded-md ring-1 ring-gray-300 hover:bg-gray-100">
+                                    <NavLink to="/signin" className="text-center py-3 px-5 bg-white text-gray-800 rounded-md ring-1 ring-gray-300 hover:bg-gray-100">
                                         Create Account
                                     </NavLink>
                                 )}
@@ -55,7 +55,7 @@ const Home = () => {
 
                         <div className="bg-gray-900 text-white rounded-md p-6 shadow">
                             <p className="text-gray-300">Welcome {user ? `@${user.username}` : "coder"}</p>
-                            <div className="grid grid-cols-3 gap-3 mt-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
                                 <div className="bg-white text-gray-900 rounded-md p-4">
                                     <p className="text-3xl font-bold">{stats.problems}</p>
                                     <p className="text-sm text-gray-500">Problems</p>
@@ -81,7 +81,7 @@ const Home = () => {
                     </div>
                 </section>
 
-                <section className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-4">
+                <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-3 gap-4">
                     {[
                         ["Practice", "Browse uploaded problems by difficulty and submit only after logging in."],
                         ["Compete", "Build contests from existing problems with a strict three-hour maximum duration."],
