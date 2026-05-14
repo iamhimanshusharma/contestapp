@@ -90,7 +90,7 @@ const Community = () => {
                             className="py-2 px-3 ring-2 ring-gray-200 rounded-md w-full"
                         />
                         <div className="flex justify-end mt-3">
-                            <button className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
+                            <button className="py-2 px-4 text-white rounded-md shadow bg-[#ffa116] hover:bg-[#e8920f] cursor-pointer">
                                 Post
                             </button>
                         </div>

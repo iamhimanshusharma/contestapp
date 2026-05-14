@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import Header from '../Header';
 import { api } from '../api';
 import { useAuth } from '../auth/AuthContext';
@@ -92,9 +92,17 @@ const CreateContest = () => {
             <form onSubmit={onSubmit} className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-2xl text-gray-700 font-bold">Create Contest</p>
-                    <button className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition cursor-pointer">
-                        Create
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <NavLink
+                            to="/challenge/create"
+                            className="py-2 px-4 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition cursor-pointer text-sm font-medium"
+                        >
+                            + Create Problem
+                        </NavLink>
+                        <button className="py-2 px-4 text-white rounded-md shadow bg-[#ffa116] hover:bg-[#e8920f] transition cursor-pointer text-sm font-medium">
+                            Create Contest
+                        </button>
+                    </div>
                 </div>
 
                 {message && <p className="text-sm text-red-600">{message}</p>}

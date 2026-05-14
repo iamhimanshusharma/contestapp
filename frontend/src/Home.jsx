@@ -31,7 +31,7 @@ const Home = () => {
                 <section className="bg-white border-b border-gray-200">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 sm:gap-10 items-center">
                         <div>
-                            <p className="text-sm font-bold text-green-600 uppercase">Code, compete, discuss</p>
+                            <p className="text-sm font-bold text-[#ffa116] uppercase">Code, compete, discuss</p>
                             <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mt-3 leading-tight">
                                 Practice problems and run contests from one focused workspace.
                             </h1>
@@ -39,7 +39,7 @@ const Home = () => {
                                 Upload challenges, solve in the editor, register for contests before they start, and compare results after submissions are judged.
                             </p>
                             <div className="grid gap-3 mt-8 sm:flex sm:flex-wrap">
-                                <NavLink to="/problems" className="text-center py-3 px-5 bg-green-500 text-white rounded-md shadow hover:bg-green-600">
+                                <NavLink to="/problems" className="text-center py-3 px-5 text-white rounded-md shadow bg-[#ffa116] hover:bg-[#e8920f]">
                                     Start Solving
                                 </NavLink>
                                 <NavLink to="/contests" className="text-center py-3 px-5 bg-gray-900 text-white rounded-md shadow hover:bg-black">
@@ -70,7 +70,7 @@ const Home = () => {
                                 </div>
                             </div>
                             <div className="mt-6 space-y-3">
-                                <NavLink to="/challenge/create" className="block py-3 px-4 rounded-md bg-green-500 hover:bg-green-600">
+                                <NavLink to="/challenge/create" className="block py-3 px-4 rounded-md bg-[#ffa116] hover:bg-[#e8920f]">
                                     Upload a Problem
                                 </NavLink>
                                 <NavLink to="/contests/create" className="block py-3 px-4 rounded-md bg-white text-gray-900 hover:bg-gray-100">

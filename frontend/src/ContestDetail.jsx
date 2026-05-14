@@ -75,11 +75,11 @@ const ContestDetail = () => {
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     {canRegister && (
-                        <button onClick={register} className="py-2 px-4 bg-green-500 text-white rounded-md shadow hover:bg-green-600 cursor-pointer">
+                        <button onClick={register} className="py-2 px-4 text-white rounded-md shadow bg-[#ffa116] hover:bg-[#e8920f] cursor-pointer">
                             Register
                         </button>
                     )}
-                    {isRegistered && <span className="py-2 px-4 bg-green-100 text-green-700 rounded-md font-medium">Registered</span>}
+                    {isRegistered && <span className="py-2 px-4 bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 rounded-md font-medium">Registered</span>}
                     <p className="text-sm text-gray-500">{statusMessage}</p>
                 </div>
 
