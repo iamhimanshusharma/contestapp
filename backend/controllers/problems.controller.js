@@ -3,12 +3,23 @@ import { TestCase } from "../models/testcases.model.js"
 
 export const getAllProblems = async (req, res) => {
     try {
-
         const getProblems = await Problem.find({});
+
+        // Compute per-tag counts
+        const tagCounts = {};
+        for (const problem of getProblems) {
+            if (Array.isArray(problem.tags)) {
+                for (const tag of problem.tags) {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                }
+            }
+        }
 
         return res.status(200).json({
             success: true,
-            problems: getProblems
+            problems: getProblems,
+            totalCount: getProblems.length,
+            tagCounts
         })
     } catch (error) {
         console.log(error);
@@ -64,12 +75,12 @@ export const getProblemById = async (req, res) => {
 
 export const uploadProblems = async (req, res) => {
     try {
-        const { problemId, title, difficulty, description, input, output, constraints, testcases } = req.body;
+        const { problemId, title, difficulty, description, input, output, constraints, testcases, tags } = req.body;
 
         if (!problemId || !title || !difficulty || !description || !input || !output || !constraints || !testcases) {
             return res.status(409).json({
                 success: false,
-                message: "Something is missiong"
+                message: "Something is missing"
             })
         }
 
@@ -91,6 +102,7 @@ export const uploadProblems = async (req, res) => {
             input,
             output,
             constraints,
+            tags: Array.isArray(tags) ? tags : [],
             createdby: req.user?._id
         })
 

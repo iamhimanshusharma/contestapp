@@ -161,6 +161,52 @@ export const submitSolution = async (req, res) => {
             }
         }
 
+        if (type === "custom") {
+            const { customInput = "", customExpected = "" } = req.body;
+
+            try {
+                await ensureSandbox();
+                await execPromise(`docker exec ${containerName} mkdir -p /app/${isolatedFolderName}`);
+                await dockerExecWithInput(
+                    ["exec", "-i", containerName, "sh", "-c", `cat > /app/${isolatedFolderName}/${lang.file}`],
+                    code
+                );
+                if (lang.compile) {
+                    await execPromise(`docker exec ${containerName} sh -c "cd /app/${isolatedFolderName} && ${lang.compile}"`);
+                }
+            } catch (err) {
+                await cleanupSandboxFolder(isolatedFolderName);
+                return res.status(200).json({
+                    success: false,
+                    message: "Compilation error",
+                    error: err.stderr || err.message || "Could not compile code"
+                });
+            }
+
+            try {
+                const { stdout } = await dockerExecWithInput(
+                    ["exec", "-i", containerName, "sh", "-c", `cd /app/${isolatedFolderName} && timeout 5s ${lang.run}`],
+                    customInput
+                );
+                const output = stdout.trim();
+                const expected = customExpected.trim();
+                const passed = expected !== "" ? output === expected : null; // null = no expected provided
+
+                await cleanupSandboxFolder(isolatedFolderName);
+                return res.status(200).json({
+                    success: true,
+                    results: [{ input: customInput, output, expected, passed }]
+                });
+            } catch (err) {
+                await cleanupSandboxFolder(isolatedFolderName);
+                return res.status(200).json({
+                    success: false,
+                    message: "Runtime error",
+                    error: err.stderr || err.stdout || "Program did not finish successfully"
+                });
+            }
+        }
+
         if (type === "sample") {
             testcases = await TestCase.aggregate([
                 { $match: { problemId: problem._id } },
@@ -283,6 +329,33 @@ export const submitSolution = async (req, res) => {
             success: false,
             message: "Server error",
             error: err.stderr || err.message || "Execution failed"
+        });
+    }
+};
+
+export const getSubmissionsByProblemId = async (req, res) => {
+    try {
+        const { problemId } = req.params;
+        
+        const problem = await Problem.findOne({ problemId });
+        if (!problem) {
+            return res.status(404).json({ success: false, message: "Problem not found" });
+        }
+
+        const submissions = await Submission.find({ 
+            user: req.user._id, 
+            problem: problem._id 
+        }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            submissions
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message
         });
     }
 };
