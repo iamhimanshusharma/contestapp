@@ -115,29 +115,29 @@ const Header = () => {
 
                             {/* Dropdown */}
                             {dropdownOpen && (
-                                <div className="absolute top-14 right-4 sm:right-6 w-72 bg-[#1e1e1e] dark:bg-[#1e1e1e] border border-[#333] rounded-xl shadow-2xl z-[100] overflow-y-auto animate-fade-in-down" style={{ maxHeight: 'calc(100vh - 72px)' }}>
+                                <div className="absolute top-14 right-4 sm:right-6 w-72 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-y-auto animate-fade-in-down" style={{ maxHeight: 'calc(100vh - 72px)' }}>
                                     {/* User header — click to go to /profile */}
                                     <button
                                         onClick={() => { setDropdownOpen(false); navigate('/profile'); }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#2a2a2a] transition-colors text-left"
+                                        className="w-full flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors text-left"
                                     >
                                         <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#ffa116]/40">
                                             <UserAvatar user={user} />
                                         </div>
                                         <div>
-                                            <div className="text-white font-semibold text-sm leading-tight">{user.name || user.email}</div>
+                                            <div className="text-gray-900 dark:text-white font-semibold text-sm leading-tight">{user.name || user.email}</div>
                                             <div className="text-[#ffa116] text-xs mt-0.5 leading-tight">Access all features with our Premium subscription!</div>
                                         </div>
                                     </button>
 
                                     {/* Quick action grid — 4 cols compact */}
-                                    <div className="grid grid-cols-4 gap-2 px-3 py-3 border-b border-[#2a2a2a]">
+                                    <div className="grid grid-cols-4 gap-2 px-3 py-3 border-b border-gray-200 dark:border-[#2a2a2a]">
                                         {quickActions.map((action, i) => (
-                                            <button key={i} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-[#2a2a2a] hover:bg-[#333] transition-colors group">
+                                            <button key={i} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-transparent hover:bg-gray-100 dark:bg-[#2a2a2a] dark:hover:bg-[#333] transition-colors group">
                                                 <div className={`w-8 h-8 rounded-lg ${i === 3 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : action.bg} flex items-center justify-center group-hover:scale-105 transition-transform`}>
                                                     {i === 3 ? <Coins size={17} className="text-white" /> : React.cloneElement(action.icon, { size: 17 })}
                                                 </div>
-                                                <span className="text-[10px] text-gray-300 font-medium leading-tight text-center">{action.label}</span>
+                                                <span className="text-[10px] text-gray-600 dark:text-gray-300 font-medium leading-tight text-center">{action.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -145,17 +145,17 @@ const Header = () => {
                                     {/* Menu items */}
                                     <div className="py-2">
                                         {menuItems.map((item, i) => (
-                                            <button key={i} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#2a2a2a] transition-colors text-gray-300 hover:text-white">
-                                                <span className="text-gray-400">{item.icon}</span>
+                                            <button key={i} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                                                <span className="text-gray-500 dark:text-gray-400">{item.icon}</span>
                                                 <span className="text-sm flex-1 text-left">{item.label}</span>
-                                                {item.chevron && <ChevronRight size={14} className="text-gray-500" />}
+                                                {item.chevron && <ChevronRight size={14} className="text-gray-400 dark:text-gray-500" />}
                                             </button>
                                         ))}
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#2a2a2a] transition-colors text-gray-300 hover:text-red-400"
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
                                         >
-                                            <LogOut size={17} className="text-gray-400" />
+                                            <LogOut size={17} className="text-gray-500 dark:text-gray-400 group-hover:text-red-500" />
                                             <span className="text-sm">Sign Out</span>
                                         </button>
                                     </div>
