@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Moon, Sun, Search, Bell, Flame, ChevronRight, List, BookOpen, TrendingUp, Coins, FlaskConical, ShoppingBag, Gamepad2, Settings, Palette, LogOut } from 'lucide-react'
+import { Moon, Sun, Search, Bell, Flame, ChevronRight, List, BookOpen, TrendingUp, Coins, FlaskConical, ShoppingBag, Gamepad2, Settings, Palette, LogOut, ChevronLeft } from 'lucide-react'
 import { useAuth } from './auth/AuthContext'
 import UserAvatar from './UserAvatar'
 
@@ -55,10 +55,15 @@ const Header = () => {
                 <div className="flex items-center gap-6 h-full">
                     {/* Logo */}
                     <NavLink to="/" className="flex items-center gap-2">
-                        <div className="flex items-center justify-center w-6 h-6 rounded bg-[#ffa116] text-white">
-                            <ChevronRight size={18} strokeWidth={3} />
+                        <div className="flex flex-col items-center mb-6">
+                            <div className="w-8 h-8 mt-6 flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-[#ffa116]">
+                                    <path d="M16 18l2.29-2.29c.39-.39.39-1.02 0-1.41l-2.29-2.29" />
+                                    <path d="M22 12l-10-10L2 12l10 10 10-10z" />
+                                </svg>
+                            </div>
                         </div>
-                        <span className="text-lg font-bold text-gray-900 dark:text-white hidden sm:block">LeetCode</span>
+                        <span className="text-lg font-bold text-gray-900 dark:text-white hidden sm:block">ContestApp</span>
                     </NavLink>
 
                     {/* Navigation */}
@@ -162,15 +167,16 @@ const Header = () => {
                                 </div>
                             )}
 
-                            <NavLink to="/premium" className="hidden sm:flex items-center justify-center h-7 px-3 rounded bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 text-xs font-semibold transition-colors">
+                            {/* After login premium button */}
+                            {/* <NavLink to="/premium" className="hidden sm:flex items-center justify-center h-7 px-3 rounded bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 text-xs font-semibold transition-colors">
                                 Premium
-                            </NavLink>
+                            </NavLink> */}
                         </div>
                     ) : (
                         <div className="flex items-center gap-3">
-                            <NavLink to="/login" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Sign in</NavLink>
-                            <NavLink to="/premium" className="hidden sm:flex items-center justify-center h-7 px-3 rounded bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 text-xs font-semibold transition-colors">
-                                Premium
+                            {/* <NavLink to="/login" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-md">Log In</NavLink> */}
+                            <NavLink to="/signin" className="hidden sm:flex items-center justify-center h-7 px-3 rounded bg-[#ffa116]/10 text-[#ffa116] hover:bg-[#ffa116]/20 text-sm font-semibold transition-colors">
+                                Sign Up
                             </NavLink>
                         </div>
                     )}
