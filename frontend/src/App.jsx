@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
+import IDE from "./IDE";
 import Problem from "./Problem";
-import ProblemSet from "./ProblemSet";
 import Home from "./Home";
 import Community from "./Community";
 import Contests from "./Contests"
@@ -18,17 +18,17 @@ const App = () => {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/problems" element={<ProblemSet />} />
+        <Route path="/problems" element={<Problem />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/contests" element={<Contests />} />
         <Route path="/contests/create" element={<CreateContest />} />
         <Route path="/contests/:contestId" element={<ContestDetail />} />
         <Route path="/contests/:contestId/results" element={<ContestResults />} />
-        <Route path="/contests/:contestId/problems/:problemId" element={<Problem />} />
+        <Route path="/contests/:contestId/problems/:problemId" element={<IDE />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/problems/:problemId" element={<Problem />} />
+        <Route path="/problems/:problemId" element={<IDE />} />
         <Route path="/challenge/create" element={<CreateChallenge />} />
       </Routes>
     </>

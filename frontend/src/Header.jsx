@@ -46,7 +46,6 @@ const Header = () => {
         { icon: <ShoppingBag size={17} />, label: 'Orders' },
         { icon: <Gamepad2 size={17} />, label: 'My Playgrounds' },
         { icon: <Settings size={17} />, label: 'Settings' },
-        { icon: <Palette size={17} />, label: 'Appearance', chevron: true },
     ];
 
     return (
