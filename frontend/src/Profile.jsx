@@ -53,7 +53,7 @@ const ActivityHeatmap = ({ submissions }) => {
             const count = activityMap[dateStr] || 0;
 
             // Determine color based on activity density
-            let colorClass = "bg-[#333]"; // 0
+            let colorClass = "bg-gray-100 dark:bg-[#333]"; // 0
             if (count === 1) colorClass = "bg-[#0e4429]";
             else if (count === 2) colorClass = "bg-[#006d32]";
             else if (count === 3) colorClass = "bg-[#26a641]";
@@ -74,7 +74,7 @@ const ActivityHeatmap = ({ submissions }) => {
 const Profile = () => {
     const { user, isAuthenticated } = useAuth();
     const [profile, setProfile] = useState(null);
-    const [message, setMessage] = useState("");
+    const [, setMessage] = useState("");
     const [activeTab, setActiveTab] = useState("Recent AC");
 
     useEffect(() => {
@@ -87,10 +87,10 @@ const Profile = () => {
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-[#1a1a1a] text-gray-300 font-sans">
+            <div className="min-h-screen bg-[#f7f8fa] dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-300 font-sans">
                 <Header />
                 <div className="max-w-4xl mx-auto p-4 sm:p-6 mt-10 text-center">
-                    <p className="text-xl font-bold text-gray-200">Login to view your profile.</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-gray-200">Login to view your profile.</p>
                     <NavLink to="/login" className="inline-block mt-4 py-2 px-6 bg-[#2cbb5d] text-white font-medium rounded-md hover:bg-[#2cbb5d]/90 transition-colors">Sign in</NavLink>
                 </div>
             </div>
@@ -119,7 +119,7 @@ const Profile = () => {
     const hardStroke = (solvedHard / totalProblems) * circumference;
 
     return (
-        <div className="min-h-screen bg-[#1a1a1a] text-gray-300 font-sans pb-10">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-300 font-sans pb-10">
             <Header />
 
             <main className="max-w-[1200px] mx-auto p-4 sm:p-6 mt-4">
@@ -128,63 +128,63 @@ const Profile = () => {
                     {/* LEFT SIDEBAR */}
                     <div className="md:col-span-3 space-y-4">
                         {/* User Card */}
-                        <div className="bg-[#282828] rounded-xl p-5 shadow-sm">
+                        <div className="bg-gray-50 dark:bg-[#282828] rounded-xl pt-5 sm:pt-5 pb-5 px-2 sm:px-5 shadow-none dark:shadow-sm">
                             <div className="flex items-start gap-4 mb-4">
-                                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-600">
+                                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-200 dark:bg-gray-600">
                                     <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} alt="Avatar" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h1 className="text-xl font-bold text-gray-100">{user?.username}</h1>
+                                    <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{user?.username}</h1>
                                     <p className="text-sm text-gray-500">@{user?.username}</p>
-                                    <div className="mt-2 text-xs font-medium text-gray-400">
-                                        Rank <span className="text-gray-200">216,507</span>
+                                    <div className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        Rank <span className="text-gray-900 dark:text-gray-200">216,507</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 text-xs text-gray-400 mb-5">
-                                <div><span className="text-gray-200 font-medium">0</span> Following</div>
-                                <div><span className="text-gray-200 font-medium">1</span> Followers</div>
+                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-5">
+                                <div><span className="text-gray-900 dark:text-gray-200 font-medium">0</span> Following</div>
+                                <div><span className="text-gray-900 dark:text-gray-200 font-medium">1</span> Followers</div>
                             </div>
 
                             <button className="w-full py-2 bg-[#2cbb5d]/10 hover:bg-[#2cbb5d]/20 text-[#2cbb5d] rounded-lg text-sm font-medium transition-colors mb-5">
                                 Edit Profile
                             </button>
 
-                            <div className="space-y-3 text-sm text-gray-400 border-b border-[#444] pb-5">
+                            <div className="space-y-3 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-[#444] pb-5">
                                 <div className="flex items-center gap-3"><MapPin size={16} /> India</div>
                                 <div className="flex items-center gap-3"><Link2 size={16} /> <a href="#" className="hover:text-[#ffa116]">Website</a></div>
                             </div>
 
                             {/* Community Stats */}
                             <div className="pt-5 space-y-4">
-                                <h2 className="text-sm font-bold text-gray-200 mb-2">Community Stats</h2>
+                                <h2 className="text-sm font-bold text-gray-900 dark:text-gray-200 mb-2">Community Stats</h2>
                                 <div className="flex items-center gap-3">
                                     <Eye size={16} className="text-blue-500" />
                                     <div className="flex-1 flex justify-between text-sm">
-                                        <span className="text-gray-400">Views</span>
-                                        <span className="text-gray-200 font-medium">36</span>
+                                        <span className="text-gray-500 dark:text-gray-400">Views</span>
+                                        <span className="text-gray-900 dark:text-gray-200 font-medium">36</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <CheckSquare size={16} className="text-cyan-500" />
                                     <div className="flex-1 flex justify-between text-sm">
-                                        <span className="text-gray-400">Solution</span>
-                                        <span className="text-gray-200 font-medium">1</span>
+                                        <span className="text-gray-500 dark:text-gray-400">Solution</span>
+                                        <span className="text-gray-900 dark:text-gray-200 font-medium">1</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <MessageSquare size={16} className="text-teal-500" />
                                     <div className="flex-1 flex justify-between text-sm">
-                                        <span className="text-gray-400">Discuss</span>
-                                        <span className="text-gray-200 font-medium">0</span>
+                                        <span className="text-gray-500 dark:text-gray-400">Discuss</span>
+                                        <span className="text-gray-900 dark:text-gray-200 font-medium">0</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Star size={16} className="text-yellow-500" />
                                     <div className="flex-1 flex justify-between text-sm">
-                                        <span className="text-gray-400">Reputation</span>
-                                        <span className="text-gray-200 font-medium">0</span>
+                                        <span className="text-gray-500 dark:text-gray-400">Reputation</span>
+                                        <span className="text-gray-900 dark:text-gray-200 font-medium">0</span>
                                     </div>
                                 </div>
                             </div>
@@ -192,12 +192,12 @@ const Profile = () => {
                             {/* Languages */}
                             <div className="pt-6">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-sm font-bold text-gray-200">Languages</h2>
+                                    <h2 className="text-sm font-bold text-gray-900 dark:text-gray-200">Languages</h2>
                                 </div>
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="px-2.5 py-1 rounded-full bg-[#333] text-gray-300 text-xs">C++</span>
-                                        <div className="text-xs text-gray-400"><span className="text-gray-200 font-medium">{profile?.stats?.solvedProblems || 0}</span> problems solved</div>
+                                        <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-[#333] text-gray-800 dark:text-gray-300 text-xs">C++</span>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400"><span className="text-gray-900 dark:text-gray-200 font-medium">{profile?.stats?.solvedProblems || 0}</span> problems solved</div>
                                     </div>
                                 </div>
                             </div>
@@ -210,11 +210,11 @@ const Profile = () => {
                         {/* Top Row: Progress & Badges */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Progress Card */}
-                            <div className="bg-[#282828] rounded-xl p-5 shadow-sm flex items-center justify-between">
+                            <div className="bg-white dark:bg-[#282828] rounded-xl p-5 shadow-sm flex items-center justify-between border border-transparent dark:border-[#333]">
                                 <div className="relative w-32 h-32 flex items-center justify-center">
                                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                                         {/* Background Track */}
-                                        <circle cx="50" cy="50" r={radius} fill="transparent" stroke="#333" strokeWidth="4" />
+                                        <circle cx="50" cy="50" r={radius} fill="transparent" stroke="currentColor" className="text-gray-100 dark:text-[#333]" strokeWidth="4" />
                                         {/* Easy (Cyan) */}
                                         <circle cx="50" cy="50" r={radius} fill="transparent" stroke="#00b8a3" strokeWidth="4" strokeDasharray={`${easyStroke} ${circumference}`} strokeLinecap="round" />
                                         {/* Medium (Yellow) - Offset by Easy */}
@@ -223,7 +223,7 @@ const Profile = () => {
                                         <circle cx="50" cy="50" r={radius} fill="transparent" stroke="#ff375f" strokeWidth="4" strokeDasharray={`${hardStroke} ${circumference}`} strokeDashoffset={-(easyStroke + medStroke)} strokeLinecap="round" />
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                        <div className="text-2xl font-bold text-gray-100 leading-none">
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-none">
                                             {totalSolved}<span className="text-xs text-gray-500 font-medium">/{totalProblems}</span>
                                         </div>
                                         <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
@@ -233,26 +233,26 @@ const Profile = () => {
                                 </div>
 
                                 <div className="flex-1 pl-8 space-y-3">
-                                    <div className="bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
+                                    <div className="bg-gray-100 dark:bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
                                         <span className="text-xs text-[#00b8a3] font-medium">Easy</span>
-                                        <span className="text-sm font-bold text-gray-200">{solvedEasy}<span className="text-gray-500 font-normal">/{totalEasy}</span></span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-200">{solvedEasy}<span className="text-gray-500 font-normal">/{totalEasy}</span></span>
                                     </div>
-                                    <div className="bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
+                                    <div className="bg-gray-100 dark:bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
                                         <span className="text-xs text-[#ffc01e] font-medium">Med.</span>
-                                        <span className="text-sm font-bold text-gray-200">{solvedMed}<span className="text-gray-500 font-normal">/{totalMed}</span></span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-200">{solvedMed}<span className="text-gray-500 font-normal">/{totalMed}</span></span>
                                     </div>
-                                    <div className="bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
+                                    <div className="bg-gray-100 dark:bg-[#333] rounded-md px-3 py-2 flex flex-col text-center">
                                         <span className="text-xs text-[#ff375f] font-medium">Hard</span>
-                                        <span className="text-sm font-bold text-gray-200">{solvedHard}<span className="text-gray-500 font-normal">/{totalHard}</span></span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-gray-200">{solvedHard}<span className="text-gray-500 font-normal">/{totalHard}</span></span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Badges Card (Mocked) */}
-                            <div className="bg-[#282828] rounded-xl p-5 shadow-sm relative overflow-hidden">
+                            <div className="bg-white dark:bg-[#282828] rounded-xl p-5 shadow-sm relative overflow-hidden border border-transparent dark:border-[#333]">
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="text-sm text-gray-400">Badges</div>
-                                    <ChevronRight size={16} className="text-gray-500" />
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Badges</div>
+                                    <ChevronRight size={16} className="text-gray-400 dark:text-gray-500" />
                                 </div>
                                 {/* <div className="text-3xl font-bold text-gray-200 mb-4">3</div> */}
 
@@ -270,15 +270,15 @@ const Profile = () => {
                         </div>
 
                         {/* Middle Row: Heatmap */}
-                        <div className="bg-[#282828] rounded-xl p-5 shadow-sm">
+                        <div className="bg-white dark:bg-[#282828] rounded-xl p-5 shadow-sm border border-transparent dark:border-[#333]">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="text-sm text-gray-200">
+                                <div className="text-sm text-gray-900 dark:text-gray-200">
                                     <span className="text-lg font-bold mr-1">{profile?.stats?.totalSubmissions || 0}</span>
                                     submissions in the past one year
                                 </div>
-                                <div className="flex gap-4 text-xs text-gray-400">
-                                    <div>Total active days: <span className="text-gray-200 font-medium">122</span></div>
-                                    <div>Max streak: <span className="text-gray-200 font-medium">45</span></div>
+                                <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                    <div>Total active days: <span className="text-gray-900 dark:text-gray-200 font-medium">122</span></div>
+                                    <div>Max streak: <span className="text-gray-900 dark:text-gray-200 font-medium">45</span></div>
                                 </div>
                             </div>
 
@@ -290,36 +290,36 @@ const Profile = () => {
                         </div>
 
                         {/* Bottom Row: Recent AC */}
-                        <div className="bg-[#282828] rounded-xl p-5 shadow-sm">
+                        <div className="bg-white dark:bg-[#282828] rounded-xl p-5 shadow-sm border border-transparent dark:border-[#333]">
                             {/* Tabs */}
-                            <div className="flex items-center justify-between mb-4 border-b border-[#444] pb-2">
+                            <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-[#444] pb-2">
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setActiveTab("Recent AC")}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Recent AC' ? 'bg-[#333] text-gray-200' : 'text-gray-400 hover:text-gray-200 hover:bg-[#333]/50'}`}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Recent AC' ? 'bg-gray-100 dark:bg-[#333] text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#333]/50'}`}
                                     >
                                         <Activity size={16} /> Recent AC
                                     </button>
                                     <button
                                         onClick={() => setActiveTab("List")}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'List' ? 'bg-[#333] text-gray-200' : 'text-gray-400 hover:text-gray-200 hover:bg-[#333]/50'}`}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'List' ? 'bg-gray-100 dark:bg-[#333] text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#333]/50'}`}
                                     >
                                         <List size={16} /> List
                                     </button>
                                     <button
                                         onClick={() => setActiveTab("Solutions")}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Solutions' ? 'bg-[#333] text-gray-200' : 'text-gray-400 hover:text-gray-200 hover:bg-[#333]/50'}`}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Solutions' ? 'bg-gray-100 dark:bg-[#333] text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#333]/50'}`}
                                     >
                                         <CheckSquare size={16} /> Solutions
                                     </button>
                                     <button
                                         onClick={() => setActiveTab("Discuss")}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Discuss' ? 'bg-[#333] text-gray-200' : 'text-gray-400 hover:text-gray-200 hover:bg-[#333]/50'}`}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'Discuss' ? 'bg-gray-100 dark:bg-[#333] text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#333]/50'}`}
                                     >
                                         <MessageCircle size={16} /> Discuss
                                     </button>
                                 </div>
-                                <a href="#" className="text-xs text-gray-400 hover:text-gray-200 transition-colors flex items-center">
+                                <a href="#" className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex items-center">
                                     View all submissions <ChevronRight size={14} />
                                 </a>
                             </div>
@@ -331,9 +331,9 @@ const Profile = () => {
                                         <NavLink
                                             to={`/problems/${sub.problem.problemId}`}
                                             key={idx}
-                                            className="flex items-center justify-between p-3 rounded-lg hover:bg-[#333] transition-colors group"
+                                            className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
                                         >
-                                            <div className="text-sm font-bold text-gray-300 group-hover:text-blue-400 transition-colors">
+                                            <div className="text-sm font-bold text-gray-800 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                                 {sub.problem.title}
                                             </div>
                                             <div className="text-sm text-gray-500">
